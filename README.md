@@ -8,321 +8,167 @@
 npm install lyrics-typing-engine
 ```
 
-または
+## 機能
 
-```bash
-pnpm install lyrics-typing-engine
-```
+### タイピング譜面データの構築
 
-## 主要機能
+`buildTypingMap()`
 
-- **タイピングマップの生成**: 歌詞と時間情報からタイピング用のデータ構造を自動生成
-- **入力評価**: ローマ字入力・かな入力の正誤判定とリアルタイム評価
-- **TypeScript完全対応**: 型安全な開発が可能
-- **カスタムオプション**: ジェネリック型による柔軟なオプション設定
-
-## 基本的な使い方
-
-### 1. タイピングマップの生成
+`mapJson` - タイムタグ付きタイピング譜面データ
+`charPoint` - ローマ字換算での1打鍵あたりのポイント
 
 ```typescript
-import { buildTypingMap, type MapJsonLine, type BuiltMapLine } from 'lyrics-typing-engine';
+import { buildTypingMap, type MapJsonLine } from 'lyrics-typing-engine';
 
-// 入力データ（歌詞と時間情報）
+/**
+ * @note 重要: タイムタグ付きJsonデータはtime:0から始まり、最後の歌詞は"end"にする必要があります。
+ */
 const mapJson: MapJsonLine[] = [
-  {
-    time: 0,
-    lyrics: "こんにちは",
-    word: "こんにちは",
-  },
-  {
-    time: 3.5,
-    lyrics: "世界",
-    word: "せかい",
-  },
-  {
-    time: 6.0,
-    lyrics: "end",
-    word: "",
-  }
+  { time: 0, lyrics: "こんにちは", word: "こんにちは" },
+  { time: 3.5, lyrics: "世界", word: "せかい" },
+  { time: 6.0, lyrics: "end", word: "" }
 ];
 
-// タイピングマップを生成
-const typingMap: BuiltMapLine[] = buildTypingMap(mapJson);
-
-console.log(typingMap[0]);
-// {
-//   time: 0,
-//   lyrics: "こんにちは",
-//   kanaWord: "こんにちは",
-//   word: [...], // TypeChunk配列
-//   kpm: { kana: 120, roma: 180 },
-//   notes: { kana: 5, roma: 10 },
-//   lineCount: 1
-// }
+const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 ```
 
-### 2. タイピング入力の評価
+### 入力の評価
+
+`isTypingKey()` - onKeyDownイベント時の文字入力キー判定
+`evaluateRomaTypingInput()` - onKeyDownイベント時のローマ字入力時の判定
+`evaluateKanaTypingInput()` - onKeyDownイベント時のかな入力時の判定
+`evaluateTypingInput()` - どこでも呼び出し可能な入力判定関数
 
 ```typescript
-import { evaluateRomaTypingInput, type LineWord } from 'lyrics-typing-engine';
+import { evaluateRomaTypingInput } from 'lyrics-typing-engine';
 
-// 現在のタイピング状態（typingMapから取得）
-let currentLineWord: LineWord = typingMap[0].word;
+const inputMode = "roma";
 
-// キーボードイベントを評価
 document.addEventListener('keydown', (event) => {
-  const result = evaluateRomaTypingInput(event, currentLineWord);
+  if (!isTypingKey(event)) return;
 
-  if (result.successKey) {
-    console.log('正解:', result.successKey);
-    // 状態を更新
-    currentLineWord = result.newLineWord;
-
-    // ポイント加算
-    if (result.updatePoint > 0) {
-      addScore(result.updatePoint);
-    }
-
-    // 行が完了したか確認
-    if (result.isCompleted) {
-      console.log('行完了！');
-      // 次の行へ進む
-    }
-  } else if (result.failKey) {
-    console.log('ミス:', result.failKey);
+    const typingResult =
+      inputMode === "roma" ? evaluateRomaTypingInput(event, lineWord) : evaluateKanaTypingInput(event, lineWord);
+  if (typingResult.successKey) {
+    // 正解時の処理
+    currentLineWord = typingResult.newLineWord;
+  } else if (typingResult.failKey) {
+    // ミス時の処理
   }
 });
-```
-
-### 3. かな入力の評価
-
-```typescript
-import { evaluateKanaTypingInput } from 'lyrics-typing-engine';
-
-document.addEventListener('keydown', (event) => {
-  const result = evaluateKanaTypingInput(event, currentLineWord);
-  // 処理はローマ字入力と同様
-});
-```
-
-### 4. 入力モードの動的切り替え
-
-```typescript
-import { evaluateTypingInput, type InputMode, type TypingKey } from 'lyrics-typing-engine';
-
-let inputMode: InputMode = 'roma'; // 'roma' | 'kana' | 'flick'
-
-document.addEventListener('keydown', (event) => {
-  // キー情報を構造化
-  const typingKey: TypingKey = {
-    keys: [event.key],
-    key: event.key,
-    code: event.code,
-    shift: event.shiftKey
-  };
-
-  const result = evaluateTypingInput(typingKey, inputMode, currentLineWord);
-  // 評価結果を処理
-});
-```
-
-## カスタムオプションの使用
-
-`options` フィールドに独自の型を指定できます。
-
-```typescript
-import { buildTypingMap, type MapJsonLine, type BuiltMapLine } from 'lyrics-typing-engine';
-
-// カスタムオプション型を定義
-interface MyGameOptions {
-  changeCSS?: string;        // CSS変更用
-  eternalCSS?: string;       // 永続CSS用
-  isChangeCSS?: boolean;     // CSS変更フラグ
-  changeVideoSpeed?: number; // 動画速度変更
-  difficulty?: 'easy' | 'normal' | 'hard';
-}
-
-// 型を指定して使用
-const mapJson: MapJsonLine<MyGameOptions>[] = [
-  {
-    time: 0,
-    lyrics: "イントロ",
-    word: "",
-    options: {
-      changeVideoSpeed: 0.8,
-      difficulty: 'easy'
-    }
-  },
-  {
-    time: 5.2,
-    lyrics: "高速パート",
-    word: "こうそくぱーと",
-    options: {
-      changeCSS: "color: red;",
-      difficulty: 'hard',
-      changeVideoSpeed: 1.2
-    }
-  }
-];
-
-// buildTypingMapにも型パラメータを渡す
-const typingMap: BuiltMapLine<MyGameOptions>[] = buildTypingMap<MyGameOptions>(mapJson);
-
-// options が型安全にアクセスできる
-if (typingMap[1].options?.difficulty === 'hard') {
-  console.log('高難易度モード');
-}
-```
-
-## 高度な使用例
-
-### 文字ごとのポイント設定
-
-```typescript
-// 2番目の引数でポイント倍率を指定（デフォルト: 0）
-const typingMap = buildTypingMap(mapJson, 10);
-// 各文字に10ポイントが設定されます
-```
-
-### かなチャンクへの変換のみ
-
-```typescript
-import { sentenceToKanaChunkWords } from 'lyrics-typing-engine';
-
-const sentence = "こんにちは\n世界";
-const kanaChunks = sentenceToKanaChunkWords(sentence);
-// [["こ", "ん", "に", "ち", "は"], ["せ", "か", "い"]]
 ```
 
 ### タイピングワードの生成
 
+`sentenceToKanaChunkWords()` - かなチャンク変換
+`generateTypingWord()` - タイピングワード生成
+
 ```typescript
-import { generateTypingWord, type TypeChunk } from 'lyrics-typing-engine';
+import { generateTypingWord } from 'lyrics-typing-engine';
 
-const kanaChunks = ["こ", "ん", "に", "ち", "は"];
-const typeChunks: TypeChunk[] = generateTypingWord(kanaChunks, 10);
+const kanaChunkWord = sentenceToKanaChunkWords("きゅっとひもをしばる");
+// ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
 
-console.log(typeChunks[0]);
-// {
-//   kana: "こ",
-//   romaPatterns: ["ko", "co"],
-//   point: 10,
-//   type: "kana"
-// }
+const typingWord = generateTypingWord({ kanaChunkWord, charPoint: 50 });
+
+/**
+ * [
+ *   { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
+ *   { kana: "っと", romaPatterns: ["tto", "ltutto", "xtutto", "ltsutto", "xtsutto"], point: 150, type: "kana" },
+ *   { kana: "ひ", romaPatterns: ["hi"], point: 100, type: "kana" },
+ *   { kana: "も", romaPatterns: ["mo"], point: 100, type: "kana" },
+ *   { kana: "を", romaPatterns: ["wo"], point: 100, type: "kana" },
+ *   { kana: "し", romaPatterns: ["si", "shi", "ci"], point: 100, type: "kana" },
+ *   { kana: "ば", romaPatterns: ["ba"], point: 100, type: "kana" },
+ *   { kana: "る", romaPatterns: ["ru"], point: 100, type: "kana" }
+ * ]
+ */
+
+
 ```
 
-## API リファレンス
+## カスタムオプション
 
-### buildTypingMap
+ジェネリック型で独自のオプションを定義できます。
 
 ```typescript
-function buildTypingMap<TOptions = unknown>(
-  mapJson: MapJsonLine<TOptions>[],
-  charPoint?: number
-): BuiltMapLine<TOptions>[]
+interface MyOptions {
+  changeCSS?: string;
+  changeVideoSpeed?: number;
+}
+
+const mapJson: MapJsonLine<MyOptions>[] = [
+  {
+    time: 0,
+    lyrics: "歌詞",
+    word: "かし",
+    options: { changeCSS: "color: red;" }
+  }
+];
+
+const typingMap = buildTypingMap<MyOptions>(mapJson);
 ```
 
-歌詞データからタイピングマップを生成します。
-
-**パラメータ:**
-- `mapJson`: 時間と歌詞情報を含む配列
-- `charPoint`: 1文字あたりのポイント（デフォルト: 0）
-
-**戻り値:**
-- タイピングに必要な全情報を含む `BuiltMapLine` 配列
-
-### evaluateRomaTypingInput
+## import 可能な型
 
 ```typescript
-function evaluateRomaTypingInput(
-  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: LineWord
-): TypingEvaluationResult
-```
-
-ローマ字入力を評価します。
-
-### evaluateKanaTypingInput
-
-```typescript
-function evaluateKanaTypingInput(
-  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: LineWord
-): TypingEvaluationResult
-```
-
-かな入力を評価します。
-
-### evaluateTypingInput
-
-```typescript
-function evaluateTypingInput(
-  typingKeys: TypingKey,
-  inputMode: InputMode,
-  lineWord: LineWord
-): TypingEvaluationResult
-```
-
-入力モードに応じて入力を評価します。
-
-## 型定義
-
-### MapJsonLine
-
-```typescript
+// タイムタグ付きJsonデータ型
 interface MapJsonLine<TOptions = unknown> {
-  time: string | number;  // 歌詞が表示される時間（秒）
-  lyrics: string;         // 表示する歌詞
-  word: string;          // タイピング対象のかな文字列
-  options?: TOptions;     // カスタムオプション
+  time: string | number; // 時間(ミリ秒)
+  lyrics: string; // 歌詞
+  word: string; // ひらがなで記述されたタイピングワード
+  options?: TOptions; // オプション(カスタムオプション)
 }
-```
 
-### BuiltMapLine
-
-```typescript
+// ビルド済みタイピング譜面データ型
 interface BuiltMapLine<TOptions = unknown> {
-  time: number;                              // 開始時間
-  word: TypeChunk[];                        // タイピング用文字配列
-  lyrics: string;                            // 歌詞
-  kpm: { kana: number; roma: number };      // 1分あたりの打鍵数
-  notes: { kana: number; roma: number };    // 総打鍵数
-  lineCount?: number;                        // 行番号
-  kanaWord: string;                          // かな文字列
-  options?: TOptions;                        // カスタムオプション
+  time: number; // 時間(ミリ秒)
+  word: TypeChunk[]; // ビルド済みタイピングワード
+  lyrics: string; // 歌詞
+  kpm: { kana: number; roma: number }; // フレーズの要求速度
+  notes: { kana: number; roma: number }; // フレーズの要求打鍵数
+  kanaWord: string; // ひらがなで記述されたタイピングワード
+  options?: TOptions; // オプション(カスタムオプション)
 }
-```
 
-### TypeChunk
-
-```typescript
+// ビルド済みタイピングチャンク 型
 interface TypeChunk {
-  kana: string;                    // かな文字
-  romaPatterns: string[];          // 入力可能なローマ字パターン
-  point: number;                   // ポイント
-  type: "kana" | "alphabet" | "num" | "symbol" | "space" | undefined;
-  kanaUnSupportedSymbol?: string;  // かな入力非対応記号
+  kana: string; // ひらがな
+  romaPatterns: string[]; // ローマ字パターン
+  point: number; // ポイント
+  type: "kana" | "alphabet" | "num" | "symbol" | "space" | undefined; // タイピングチャンクの種類
 }
-```
 
-### TypingEvaluationResult
-
-```typescript
+// タイピング入力時の判定 型
 interface TypingEvaluationResult {
-  newLineWord: LineWord;           // 更新後の状態
-  successKey: string | undefined;  // 成功したキー
-  failKey: string | undefined;     // 失敗したキー
-  charType: TypeChunk["type"];     // 文字タイプ
-  isCompleted: boolean;            // 行完了フラグ
-  updatePoint: number;             // 獲得ポイント
+  newLineWord: LineWord; // 更新後のタイピングワード
+  successKey: string | undefined; // 正解時の入力キー
+  failKey: string | undefined; // ミス時の入力キー
+  charType: TypeChunk["type"]; // 入力したタイピングチャンクの種類
+  isCompleted: boolean; // 打ち切り判定
+  updatePoint: number; // 加算ポイント
 }
-```
 
-### InputMode
+// タイピングキー 型
+interface TypingKey {
+  key: string; // 入力キー
+  code: string; // 入力コード
+  shiftKey: boolean; // Shiftキーの状態
+  keyCode: number; // 入力キーのコード
+}
 
-```typescript
-type InputMode = "roma" | "kana" | "flick";
+// タイピングモード 型
+type InputMode = "roma" | "kana";
+
+// タイピングワード 型
+interface LineWord {
+  correct: { kana: string; roma: string }; // 正解したローマ字・かな
+  nextChar: TypeChunk; // 次のタイピングチャンク
+  word: TypeChunk[]; // 残りタイピングワード
+}
+
+
+
 ```
 
 ## ライセンス
@@ -332,4 +178,3 @@ MIT
 ## 作者
 
 toshi7878
-

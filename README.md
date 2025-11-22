@@ -55,7 +55,7 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *     word: [
  *       { kana: "せ", romaPatterns: ["se", "ce"], point: 100, type: "kana" },
  *       { kana: "か", romaPatterns: ["ka", "ca"], point: 100, type: "kana" },
- *       { kana: "い", romaPatterns: ["i"], point: 50, type: "kana" }
+ *       { kana: "い", romaPatterns: ["i", "yi"], point: 50, type: "kana" }
  *     ],
  *     kpm: { kana: 72, roma: 120 },
  *     notes: { kana: 3, roma: 5 },
@@ -202,7 +202,7 @@ interface TypingKey {
   keyCode: number; // 入力キーのコード
 }
 
-// タイピングモード 型
+// 入力モード 型
 type InputMode = "roma" | "kana";
 
 // タイピングワード 型
@@ -211,9 +211,76 @@ interface LineWord {
   nextChar: TypeChunk; // 次のタイピングチャンク
   word: TypeChunk[]; // 残りタイピングワード
 }
+```
+
+## 汎用関数作成例
+
+```typescript
+
+// タイピング行のインデックスを抽出
+export function extractTypingLineIndexes(lines: BuiltMapLine[]): number[] {
+  const typingLineIndexes: number[] = [];
+
+  for (const [index, line] of builtMapLines.entries()) {
+    if (line.notes.roma > 0) {
+      typingLineIndexes.push(index);
+    }
+  }
+
+  return typingLineIndexes;
+}
+
+// 最初のタイピング行を取得
+export const getStartLine = (lines: BuiltMapLine[]) => {
+  if (!lines[0]) {
+    throw new Error("lines is empty: cannot find start line");
+  }
+
+  for (const [index, line] of lines.entries()) {
+    if (line.notes.roma > 0) {
+      return { ...line, index };
+    }
+  }
+
+  return { ...lines[0], index: lines.length - 1 };
+};
+
+// 速度の難易度を計算
+export const calculateSpeedDifficulty = (lines: BuiltMapLine[]) => {
+  const romaSpeedList = lines.map((line) => line.kpm.roma);
+  const kanaSpeedList = lines.map((line) => line.kpm.kana);
+
+  const romaMedianSpeed = medianIgnoringZeros(romaSpeedList);
+  const kanaMedianSpeed = medianIgnoringZeros(kanaSpeedList);
+  const romaMaxSpeed = Math.max(...romaSpeedList);
+  const kanaMaxSpeed = Math.max(...kanaSpeedList);
+
+  return {
+    median: { roma: romaMedianSpeed, kana: kanaMedianSpeed },
+    max: { roma: romaMaxSpeed, kana: kanaMaxSpeed },
+  };
+};
+
+// 譜面の打鍵数を計算
+export const calculateTotalNotes = (lines: BuiltMapLine[]) => {
+  return lines.reduce(
+    (acc, line) => {
+      acc.kana += line.notes.kana;
+      acc.roma += line.notes.roma;
+      return acc;
+    },
+    { kana: 0, roma: 0 },
+  );
+};
 
 
+// クリア率を計算するための1打鍵あたりのキー率とミス率を計算
+export const calculateKeyAndMissRates = ({ romaTotalNotes }: { romaTotalNotes: number }) => {
+  const keyRate = 100 / romaTotalNotes;
+  const missRate = keyRate / 2;
 
+  return { keyRate, missRate };
+};
 ```
 
 ## ライセンス

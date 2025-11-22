@@ -1,6 +1,6 @@
 export { buildTypingMap } from "./build-typing-map/build-map";
-export { buildTypingWord } from "./build-typing-map/build-word";
 export { parseKanaChunks } from "./build-typing-map/parse-kana-chunks";
+export { parseRomaPatterns } from "./build-typing-map/parse-roma-patterns";
 export { isTypingKey } from "./evaluator/is-typing-key";
 export type { TypingEvaluationResult, TypingKey } from "./evaluator/type";
 export {

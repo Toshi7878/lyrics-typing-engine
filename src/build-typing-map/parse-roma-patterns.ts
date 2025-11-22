@@ -9,11 +9,17 @@ const NN_LIST = ["あ", "い", "う", "え", "お", "な", "に", "ぬ", "ね", 
 const SOKUON_JOIN_LIST = ["ヰ", "ゐ", "ヱ", "ゑ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "っ", "ゎ", "ヵ", "ヶ", "ゔ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ", "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
 const KANA_UNSUPPORTED_SYMBOLS = ["←", "↓", "↑", "→"];
 
-export const buildTypingWord = ({ kanaChunkWord, charPoint = 0 }: { kanaChunkWord: string[]; charPoint: number }) => {
-  const hasWord = !!kanaChunkWord.length;
+export const parseRomaPatterns = ({
+  kanaWordChunks,
+  charPoint = 0,
+}: {
+  kanaWordChunks: string[];
+  charPoint: number;
+}) => {
+  const hasWord = !!kanaWordChunks.length;
 
   if (hasWord) {
-    return buildTypeChunks(kanaChunkWord, charPoint);
+    return buildTypeChunks(kanaWordChunks, charPoint);
   }
 
   return [{ kana: "", romaPatterns: [""], point: 0, type: undefined }];

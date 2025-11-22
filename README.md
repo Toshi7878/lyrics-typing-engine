@@ -106,15 +106,15 @@ document.addEventListener('keydown', (event) => {
 
 `parseKanaChunks()` - かなチャンク変換
 
-`buildTypingWord()` - タイピングワード生成
+`parseRomaPatterns()` - タイピングローマ字チャンク生成
 
 ```typescript
-import { buildTypingWord } from 'lyrics-typing-engine';
+import { parseRomaPatterns } from 'lyrics-typing-engine';
 
-const kanaChunkWord = parseKanaChunks("きゅっとひもをしばる");
+const kanaWordChunks = parseKanaChunks("きゅっとひもをしばる");
 // ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
 
-const typingWord = buildTypingWord({ kanaChunkWord, charPoint: 50 });
+const wordChunks = parseRomaPatterns({ kanaWordChunks, charPoint: 50 });
 
 /**
  * [
@@ -151,7 +151,7 @@ const mapJson: MapJsonLine<MyOptions>[] = [
   }
 ];
 
-const typingMap = buildTypingMap<MyOptions>(mapJson);
+const builtMap = buildTypingMap<MyOptions>({ mapJson, charPoint: 0 });
 ```
 
 ## import 可能な型

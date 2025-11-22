@@ -1,8 +1,8 @@
 import type { BuiltMapLine, MapJsonLine, WordChunk } from "../type";
 import { zip } from "../utils/array";
 import { countKanaWordWithDakuonSplit } from "../utils/kana";
-import { buildTypingWord } from "./build-word";
 import { parseKanaChunks } from "./parse-kana-chunks";
+import { parseRomaPatterns } from "./parse-roma-patterns";
 
 export const buildTypingMap = <TOptions = unknown>({
   mapJson,
@@ -13,17 +13,17 @@ export const buildTypingMap = <TOptions = unknown>({
 }): BuiltMapLine<TOptions>[] => {
   const wordsData: BuiltMapLine<TOptions>[] = [];
 
-  const kanaChunks = parseKanaChunks(mapJson.map((line) => line.word).join("\n"));
-  for (const [i, [mapLine, kanaChunkWord]] of zip(mapJson, kanaChunks).entries()) {
+  const kanaChunksLines = parseKanaChunks(mapJson.map((line) => line.word).join("\n"));
+  for (const [i, [mapLine, kanaWordChunks]] of zip(mapJson, kanaChunksLines).entries()) {
     const line = {
       time: Number(mapLine.time),
       lyrics: mapLine.lyrics,
-      kanaWord: kanaChunkWord.join(""),
-      wordChunks: buildTypingWord({ kanaChunkWord, charPoint }),
+      kanaWord: kanaWordChunks.join(""),
+      wordChunks: parseRomaPatterns({ kanaWordChunks, charPoint }),
       options: mapLine.options,
     };
 
-    const hasWord = !!kanaChunkWord.length;
+    const hasWord = !!kanaWordChunks.length;
     const nextLine = mapJson[i + 1];
     if (hasWord && line.lyrics !== "end" && nextLine) {
       const notes = calcLineNotes(line.wordChunks);

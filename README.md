@@ -53,6 +53,7 @@ document.addEventListener('keydown', (event) => {
 
     const typingResult =
       inputMode === "roma" ? evaluateRomaTypingInput(event, lineWord) : evaluateKanaTypingInput(event, lineWord);
+
   if (typingResult.successKey) {
     // 正解時の処理
     currentLineWord = typingResult.newLineWord;

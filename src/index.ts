@@ -4,8 +4,8 @@ export { parseKanaToWordChunks } from "./build-typing-map/parse-kana-to-word-chu
 export { isTypingKey } from "./evaluator/is-typing-key";
 export type { TypingEvaluationResult, TypingKey } from "./evaluator/type";
 export {
-  evaluateKanaTypingInput,
-  evaluateRomaTypingInput,
+  evaluateKanaInput,
+  evaluateRomaInput,
   evaluateTypingInput,
 } from "./evaluator/typing-input-evaluator";
 export type {

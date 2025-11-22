@@ -3,7 +3,7 @@ import { kanaInput, kanaMakeInput } from "./kana-input";
 import { romaInput, romaMakeInput } from "./roma-input";
 import type { TypingEvaluationResult, TypingKey } from "./type";
 
-export const evaluateRomaTypingInput = (
+export const evaluateRomaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
   lineWord: LineWord,
 ): TypingEvaluationResult => {
@@ -20,7 +20,7 @@ export const evaluateRomaTypingInput = (
   };
 };
 
-export const evaluateKanaTypingInput = (
+export const evaluateKanaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
   lineWord: LineWord,
 ): TypingEvaluationResult => {

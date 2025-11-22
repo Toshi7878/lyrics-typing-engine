@@ -74,16 +74,16 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 
 ### 入力の判定
 
-`isTypingKey()` - onKeyDownイベント時の文字入力キー判定
+`isTypingKey(event: KeyboardEvent)` - イベント時の文字入力キー判定
 
-`evaluateRomaTypingInput()` - onKeyDownイベント時のローマ字入力時の判定
+`evaluateRomaInput(event: KeyboardEvent, lineWord: LineWord)` - ローマ字入力時の判定
 
-`evaluateKanaTypingInput()` - onKeyDownイベント時のかな入力時の判定
+`evaluateKanaInput(event: KeyboardEvent, lineWord: LineWord)` - かな入力時の判定
 
-`evaluateTypingInput()` - どこでも呼び出し可能な入力判定関数
+`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, lineWord: LineWord)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
 
 ```typescript
-import { evaluateRomaTypingInput } from 'lyrics-typing-engine';
+import { evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
 
 const inputMode = "roma";
 
@@ -91,7 +91,7 @@ document.addEventListener('keydown', (event) => {
   if (!isTypingKey(event)) return;
 
     const typingResult =
-      inputMode === "roma" ? evaluateRomaTypingInput(event, lineWord) : evaluateKanaTypingInput(event, lineWord);
+      inputMode === "roma" ? evaluateRomaInput(event, lineWord) : evaluateKanaInput(event, lineWord);
 
   if (typingResult.successKey) {
     // 正解時の処理

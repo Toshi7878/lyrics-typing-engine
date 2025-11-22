@@ -12,23 +12,20 @@ export const buildTypingMap = <TOptions = unknown>({
   charPoint: number;
 }): BuiltMapLine<TOptions>[] => {
   const wordsData: BuiltMapLine<TOptions>[] = [];
-  let lineLength = 0;
 
   const kanaChunkWords = sentenceToKanaChunkWords(mapJson.map((line) => line.word).join("\n"));
   for (const [i, [mapLine, kanaChunkWord]] of zip(mapJson, kanaChunkWords).entries()) {
     const line = {
       time: Number(mapLine.time),
       lyrics: mapLine.lyrics,
+      word: generateTypingWord({ kanaChunkWord, charPoint }),
       kanaWord: kanaChunkWord.join(""),
       options: mapLine.options,
-      word: generateTypingWord({ kanaChunkWord, charPoint }),
     };
 
     const hasWord = !!kanaChunkWord.length;
     const nextLine = mapJson[i + 1];
     if (hasWord && line.lyrics !== "end" && nextLine) {
-      lineLength++;
-
       const notes = calcLineNotes(line.word);
       wordsData.push({
         kpm: calcLineKpm({
@@ -36,7 +33,6 @@ export const buildTypingMap = <TOptions = unknown>({
           lineDuration: Number(nextLine.time) - line.time,
         }),
         notes,
-        lineCount: lineLength,
         ...line,
       });
     } else {

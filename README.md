@@ -31,6 +31,45 @@ const mapJson: MapJsonLine[] = [
 ];
 
 const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
+
+/**
+ * [
+ *   {
+ *     time: 0,
+ *     lyrics: "こんにちは",
+ *     kanaWord: "こんにちは",
+ *     word: [
+ *       { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
+ *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
+ *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
+ *       { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
+ *       { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" }
+ *     ],
+ *     kpm: { kana: 85, roma: 154 },
+ *     notes: { kana: 5, roma: 10 },
+ *   },
+ *   {
+ *     time: 3.5,
+ *     lyrics: "世界",
+ *     kanaWord: "せかい",
+ *     word: [
+ *       { kana: "せ", romaPatterns: ["se", "ce"], point: 100, type: "kana" },
+ *       { kana: "か", romaPatterns: ["ka", "ca"], point: 100, type: "kana" },
+ *       { kana: "い", romaPatterns: ["i"], point: 50, type: "kana" }
+ *     ],
+ *     kpm: { kana: 72, roma: 120 },
+ *     notes: { kana: 3, roma: 5 },
+ *   },
+ *   {
+ *     time: 6,
+ *     lyrics: "end",
+ *     kanaWord: "",
+ *     word: [],
+ *     kpm: { kana: 0, roma: 0 },
+ *     notes: { kana: 0, roma: 0 }
+ *   }
+ * ]
+ */
 ```
 
 ### 入力の判定

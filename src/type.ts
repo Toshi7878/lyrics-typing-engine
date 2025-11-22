@@ -27,7 +27,6 @@ export interface BuiltMapLine<TOptions = unknown> {
   lyrics: string;
   kpm: { kana: number; roma: number };
   notes: { kana: number; roma: number };
-  lineCount?: number;
   kanaWord: string;
   options?: TOptions;
 }

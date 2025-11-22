@@ -4,7 +4,7 @@ import { countKanaWordWithDakuonSplit } from "../utils/kana";
 import { generateTypingWord } from "./generate-typing-word";
 import { sentenceToKanaChunkWords } from "./sentence-to-kana-chunk-words";
 
-export const buildTypingMap = (mapJson: MapJsonLine[], charPoint: number): BuiltMapLine[] => {
+export const buildTypingMap = (mapJson: MapJsonLine[], charPoint: number = 0): BuiltMapLine[] => {
   const wordsData: BuiltMapLine[] = [];
   let lineLength = 0;
 

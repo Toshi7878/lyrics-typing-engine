@@ -1,6 +1,6 @@
 {
   "name": "lyrics-typing-engine",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "A typing engine designed for music-based typing games. Provides time-tagged typing map generation and kana/roma input evaluation synchronized with music playback.",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -12,7 +12,8 @@
     "check": "biome check --diagnostic-level=warn --reporter=summary",
     "check:fix": "biome check --diagnostic-level=warn --reporter=summary --write",
     "typecheck": "tsc --noEmit",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "upload": "pnpm build && pnpm publish"
   },
   "author": "toshi7878",
   "license": "MIT",

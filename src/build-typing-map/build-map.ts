@@ -4,10 +4,13 @@ import { countKanaWordWithDakuonSplit } from "../utils/kana";
 import { generateTypingWord } from "./generate-typing-word";
 import { sentenceToKanaChunkWords } from "./sentence-to-kana-chunk-words";
 
-export const buildTypingMap = <TOptions = unknown>(
-  mapJson: MapJsonLine<TOptions>[],
-  charPoint: number = 0,
-): BuiltMapLine<TOptions>[] => {
+export const buildTypingMap = <TOptions = unknown>({
+  mapJson,
+  charPoint,
+}: {
+  mapJson: MapJsonLine<TOptions>[];
+  charPoint: number;
+}): BuiltMapLine<TOptions>[] => {
   const wordsData: BuiltMapLine<TOptions>[] = [];
   let lineLength = 0;
 
@@ -18,7 +21,7 @@ export const buildTypingMap = <TOptions = unknown>(
       lyrics: mapLine.lyrics,
       kanaWord: kanaChunkWord.join(""),
       options: mapLine.options,
-      word: generateTypingWord(kanaChunkWord, charPoint),
+      word: generateTypingWord({ kanaChunkWord, charPoint }),
     };
 
     const hasWord = !!kanaChunkWord.length;

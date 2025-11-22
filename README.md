@@ -33,7 +33,7 @@ const mapJson: MapJsonLine[] = [
 const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 ```
 
-### 入力の評価
+### 入力の判定
 
 `isTypingKey()` - onKeyDownイベント時の文字入力キー判定
 

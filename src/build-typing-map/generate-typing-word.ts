@@ -9,7 +9,7 @@ const NN_LIST = ["あ", "い", "う", "え", "お", "な", "に", "ぬ", "ね", 
 const SOKUON_JOIN_LIST = ["ヰ", "ゐ", "ヱ", "ゑ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "っ", "ゎ", "ヵ", "ヶ", "ゔ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ", "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
 const KANA_UNSUPPORTED_SYMBOLS = ["←", "↓", "↑", "→"];
 
-export const generateTypingWord = (kanaChunkWord: string[], charPoint: number) => {
+export const generateTypingWord = (kanaChunkWord: string[], charPoint: number = 0) => {
   const hasWord = !!kanaChunkWord.length;
 
   if (hasWord) {

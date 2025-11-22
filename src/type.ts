@@ -1,10 +1,10 @@
 export type InputMode = "roma" | "kana" | "flick";
 
-export interface MapJsonLine {
+export interface MapJsonLine<TOptions = unknown> {
   time: string | number;
   lyrics: string;
   word: string;
-  options: unknown;
+  options?: TOptions;
 }
 
 export interface TypeChunk {
@@ -17,11 +17,11 @@ export interface TypeChunk {
 
 export interface LineWord {
   correct: { kana: string; roma: string };
-  nextChar: TypeChunk & { orginalDakuChar?: Dakuten | HanDakuten};
+  nextChar: TypeChunk & { orginalDakuChar?: Dakuten | HanDakuten };
   word: TypeChunk[];
 }
 
-export interface BuiltMapLine {
+export interface BuiltMapLine<TOptions = unknown> {
   time: number;
   word: TypeChunk[];
   lyrics: string;
@@ -29,7 +29,7 @@ export interface BuiltMapLine {
   notes: { kana: number; roma: number };
   lineCount?: number;
   kanaWord: string;
-  options?: MapJsonLine["options"];
+  options?: TOptions;
 }
 
 export type Dakuten =

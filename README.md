@@ -15,6 +15,7 @@ npm install lyrics-typing-engine
 `buildTypingMap()`
 
 `mapJson` - タイムタグ付きタイピング譜面データ
+
 `charPoint` - ローマ字換算での1打鍵あたりのポイント
 
 ```typescript
@@ -35,8 +36,11 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 ### 入力の評価
 
 `isTypingKey()` - onKeyDownイベント時の文字入力キー判定
+
 `evaluateRomaTypingInput()` - onKeyDownイベント時のローマ字入力時の判定
+
 `evaluateKanaTypingInput()` - onKeyDownイベント時のかな入力時の判定
+
 `evaluateTypingInput()` - どこでも呼び出し可能な入力判定関数
 
 ```typescript
@@ -61,6 +65,7 @@ document.addEventListener('keydown', (event) => {
 ### タイピングワードの生成
 
 `sentenceToKanaChunkWords()` - かなチャンク変換
+
 `generateTypingWord()` - タイピングワード生成
 
 ```typescript

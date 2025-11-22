@@ -38,7 +38,7 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *     time: 0,
  *     lyrics: "こんにちは",
  *     kanaWord: "こんにちは",
- *     word: [
+ *     wordChunks: [
  *       { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
  *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
  *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
@@ -52,10 +52,10 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *     time: 3.5,
  *     lyrics: "世界",
  *     kanaWord: "せかい",
- *     word: [
+ *     wordChunks: [
  *       { kana: "せ", romaPatterns: ["se", "ce"], point: 100, type: "kana" },
  *       { kana: "か", romaPatterns: ["ka", "ca"], point: 100, type: "kana" },
- *       { kana: "い", romaPatterns: ["i", "yi"], point: 50, type: "kana" }
+ *       { kana: "い", romaPatterns: ["i"], point: 50, type: "kana" }
  *     ],
  *     kpm: { kana: 72, roma: 120 },
  *     notes: { kana: 3, roma: 5 },
@@ -64,7 +64,7 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *     time: 6,
  *     lyrics: "end",
  *     kanaWord: "",
- *     word: [],
+ *     wordChunks: [],
  *     kpm: { kana: 0, roma: 0 },
  *     notes: { kana: 0, roma: 0 }
  *   }
@@ -104,17 +104,17 @@ document.addEventListener('keydown', (event) => {
 
 ### タイピングワードの生成
 
-`sentenceToKanaChunkWords()` - かなチャンク変換
+`parseKanaChunks()` - かなチャンク変換
 
-`generateTypingWord()` - タイピングワード生成
+`buildTypingWord()` - タイピングワード生成
 
 ```typescript
-import { generateTypingWord } from 'lyrics-typing-engine';
+import { buildTypingWord } from 'lyrics-typing-engine';
 
-const kanaChunkWord = sentenceToKanaChunkWords("きゅっとひもをしばる");
+const kanaChunkWord = parseKanaChunks("きゅっとひもをしばる");
 // ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
 
-const typingWord = generateTypingWord({ kanaChunkWord, charPoint: 50 });
+const typingWord = buildTypingWord({ kanaChunkWord, charPoint: 50 });
 
 /**
  * [
@@ -168,7 +168,7 @@ interface MapJsonLine<TOptions = unknown> {
 // ビルド済みタイピング譜面データ型
 interface BuiltMapLine<TOptions = unknown> {
   time: number; // 時間(ミリ秒)
-  word: TypeChunk[]; // ビルド済みタイピングワード
+  wordChunks: WordChunk[]; // ビルド済みタイピングワード
   lyrics: string; // 歌詞
   kpm: { kana: number; roma: number }; // フレーズの要求速度
   notes: { kana: number; roma: number }; // フレーズの要求打鍵数
@@ -177,7 +177,7 @@ interface BuiltMapLine<TOptions = unknown> {
 }
 
 // ビルド済みタイピングチャンク 型
-interface TypeChunk {
+interface WordChunk {
   kana: string; // ひらがな
   romaPatterns: string[]; // ローマ字パターン
   point: number; // ポイント
@@ -189,7 +189,7 @@ interface TypingEvaluationResult {
   newLineWord: LineWord; // 更新後のタイピングワード
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー
-  charType: TypeChunk["type"]; // 入力したタイピングチャンクの種類
+  charType: WordChunk["type"]; // 入力したタイピングチャンクの種類
   isCompleted: boolean; // 打ち切り判定
   updatePoint: number; // 加算ポイント
 }
@@ -202,85 +202,18 @@ interface TypingKey {
   keyCode: number; // 入力キーのコード
 }
 
-// 入力モード 型
+// タイピングモード 型
 type InputMode = "roma" | "kana";
 
 // タイピングワード 型
 interface LineWord {
   correct: { kana: string; roma: string }; // 正解したローマ字・かな
-  nextChar: TypeChunk; // 次のタイピングチャンク
-  word: TypeChunk[]; // 残りタイピングワード
-}
-```
-
-## 汎用関数作成例
-
-```typescript
-
-// タイピング行のインデックスを抽出
-export function extractTypingLineIndexes(lines: BuiltMapLine[]): number[] {
-  const typingLineIndexes: number[] = [];
-
-  for (const [index, line] of builtMapLines.entries()) {
-    if (line.notes.roma > 0) {
-      typingLineIndexes.push(index);
-    }
-  }
-
-  return typingLineIndexes;
+  nextChunk: WordChunk; // 次のタイピングチャンク
+  wordChunks: WordChunk[]; // 残りタイピングワード
 }
 
-// 最初のタイピング行を取得
-export const getStartLine = (lines: BuiltMapLine[]) => {
-  if (!lines[0]) {
-    throw new Error("lines is empty: cannot find start line");
-  }
-
-  for (const [index, line] of lines.entries()) {
-    if (line.notes.roma > 0) {
-      return { ...line, index };
-    }
-  }
-
-  return { ...lines[0], index: lines.length - 1 };
-};
-
-// 速度の難易度を計算
-export const calculateSpeedDifficulty = (lines: BuiltMapLine[]) => {
-  const romaSpeedList = lines.map((line) => line.kpm.roma);
-  const kanaSpeedList = lines.map((line) => line.kpm.kana);
-
-  const romaMedianSpeed = medianIgnoringZeros(romaSpeedList);
-  const kanaMedianSpeed = medianIgnoringZeros(kanaSpeedList);
-  const romaMaxSpeed = Math.max(...romaSpeedList);
-  const kanaMaxSpeed = Math.max(...kanaSpeedList);
-
-  return {
-    median: { roma: romaMedianSpeed, kana: kanaMedianSpeed },
-    max: { roma: romaMaxSpeed, kana: kanaMaxSpeed },
-  };
-};
-
-// 譜面の打鍵数を計算
-export const calculateTotalNotes = (lines: BuiltMapLine[]) => {
-  return lines.reduce(
-    (acc, line) => {
-      acc.kana += line.notes.kana;
-      acc.roma += line.notes.roma;
-      return acc;
-    },
-    { kana: 0, roma: 0 },
-  );
-};
 
 
-// クリア率を計算するための1打鍵あたりのキー率とミス率を計算
-export const calculateKeyAndMissRates = ({ romaTotalNotes }: { romaTotalNotes: number }) => {
-  const keyRate = 100 / romaTotalNotes;
-  const missRate = keyRate / 2;
-
-  return { keyRate, missRate };
-};
 ```
 
 ## ライセンス

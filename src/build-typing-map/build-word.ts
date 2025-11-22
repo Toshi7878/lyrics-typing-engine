@@ -1,4 +1,4 @@
-import type { TypeChunk } from "../type";
+import type { WordChunk } from "../type";
 import { ALPHABET_LIST, NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
 
 // biome-ignore format:<>
@@ -9,24 +9,18 @@ const NN_LIST = ["あ", "い", "う", "え", "お", "な", "に", "ぬ", "ね", 
 const SOKUON_JOIN_LIST = ["ヰ", "ゐ", "ヱ", "ゑ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "っ", "ゎ", "ヵ", "ヶ", "ゔ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ", "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
 const KANA_UNSUPPORTED_SYMBOLS = ["←", "↓", "↑", "→"];
 
-export const generateTypingWord = ({
-  kanaChunkWord,
-  charPoint = 0,
-}: {
-  kanaChunkWord: string[];
-  charPoint: number;
-}) => {
+export const buildTypingWord = ({ kanaChunkWord, charPoint = 0 }: { kanaChunkWord: string[]; charPoint: number }) => {
   const hasWord = !!kanaChunkWord.length;
 
   if (hasWord) {
-    return generateTypeChunks(kanaChunkWord, charPoint);
+    return buildTypeChunks(kanaChunkWord, charPoint);
   }
 
   return [{ kana: "", romaPatterns: [""], point: 0, type: undefined }];
 };
 
-const generateTypeChunks = (kanaWordChunks: string[], charPoint: number) => {
-  let typeChunks: TypeChunk[] = [];
+const buildTypeChunks = (kanaWordChunks: string[], charPoint: number) => {
+  let typeChunks: WordChunk[] = [];
 
   for (const kanaChunk of kanaWordChunks) {
     const romaPatterns = [
@@ -95,7 +89,7 @@ const generateTypeChunks = (kanaWordChunks: string[], charPoint: number) => {
   return typeChunks;
 };
 
-const applyDoubleNTypePattern = (typeChunks: TypeChunk[]) => {
+const applyDoubleNTypePattern = (typeChunks: WordChunk[]) => {
   const lastChunk = typeChunks.at(-1);
   if (!lastChunk) return typeChunks;
 
@@ -113,7 +107,7 @@ const applyDoubleNTypePattern = (typeChunks: TypeChunk[]) => {
   return typeChunks;
 };
 
-const replaceNWithNN = (typeChunks: TypeChunk[], charPoint: number) => {
+const replaceNWithNN = (typeChunks: WordChunk[], charPoint: number) => {
   const prevChunk = typeChunks.at(-2);
   if (!prevChunk) return typeChunks;
 
@@ -142,7 +136,7 @@ const joinSokuonPattern = ({
   charPoint,
 }: {
   joinType: "normal" | "iun";
-  typeChunks: TypeChunk[];
+  typeChunks: WordChunk[];
   charPoint: number;
 }) => {
   const continuous: string[] = [];
@@ -185,7 +179,7 @@ const joinSokuonPattern = ({
   return typeChunks;
 };
 
-const determineCharacterType = ({ kanaChar, romaChar }: { kanaChar: string; romaChar: string }): TypeChunk["type"] => {
+const determineCharacterType = ({ kanaChar, romaChar }: { kanaChar: string; romaChar: string }): WordChunk["type"] => {
   if (ROMA_MAP.has(kanaChar)) {
     return "kana";
   }

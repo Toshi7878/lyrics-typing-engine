@@ -7,7 +7,7 @@ export interface MapJsonLine<TOptions = unknown> {
   options?: TOptions;
 }
 
-export interface TypeChunk {
+export interface WordChunk {
   kana: string;
   romaPatterns: string[];
   point: number;
@@ -17,13 +17,13 @@ export interface TypeChunk {
 
 export interface LineWord {
   correct: { kana: string; roma: string };
-  nextChar: TypeChunk & { orginalDakuChar?: Dakuten | HanDakuten };
-  word: TypeChunk[];
+  nextChunk: WordChunk & { orginalDakuChar?: Dakuten | HanDakuten };
+  wordChunks: WordChunk[];
 }
 
 export interface BuiltMapLine<TOptions = unknown> {
   time: number;
-  word: TypeChunk[];
+  wordChunks: WordChunk[];
   lyrics: string;
   kpm: { kana: number; roma: number };
   notes: { kana: number; roma: number };

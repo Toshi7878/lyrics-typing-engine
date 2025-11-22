@@ -76,7 +76,7 @@ export const kanaInput = (
 } => {
   const newLineWord = { ...lineWord };
 
-  const nextKana = lineWord.nextChar.kana;
+  const nextKana = lineWord.nextChunk.kana;
   const firstKanaChar = nextKana.charAt(0);
   const { keys } = typingKeys;
   const isdakuHandaku = DAKU_HANDAKU_LIST.some((char) => char === firstKanaChar);
@@ -91,7 +91,7 @@ export const kanaInput = (
 
   const typingKey =
     keys[successIndex] === "゛" || keys[successIndex] === "゜"
-      ? newLineWord.nextChar.orginalDakuChar
+      ? newLineWord.nextChunk.orginalDakuChar
       : keys[successIndex];
 
   if (!typingKey) {
@@ -106,11 +106,11 @@ export const kanaInput = (
 
   if (dakuHanDakuData?.type) {
     const yoon = nextKana.length >= 2 && dakuHanDakuData.type ? nextKana[1] : "";
-    newLineWord.nextChar.kana = dakuHanDakuData.type + yoon;
-    newLineWord.nextChar.orginalDakuChar = dakuHanDakuData.originalKana as Dakuten | HanDakuten;
+    newLineWord.nextChunk.kana = dakuHanDakuData.type + yoon;
+    newLineWord.nextChunk.orginalDakuChar = dakuHanDakuData.originalKana as Dakuten | HanDakuten;
   } else if (nextKana.length >= 2) {
     newLineWord.correct.kana += typingKey;
-    newLineWord.nextChar.kana = newLineWord.nextChar.kana.slice(1);
+    newLineWord.nextChunk.kana = newLineWord.nextChunk.kana.slice(1);
   } else {
     const result = wordUpdate(typingKey, newLineWord);
     return { ...result, successKey: keys[successIndex], failKey: undefined };
@@ -131,12 +131,12 @@ const parseDakuHandaku = (originalKana: Dakuten | HanDakuten): DakuHandakuData =
 };
 
 const wordUpdate = (typingKey: string, newLineWord: LineWord) => {
-  const romaPattern = newLineWord.nextChar.romaPatterns;
+  const romaPattern = newLineWord.nextChunk.romaPatterns;
 
   newLineWord.correct.kana += typingKey;
   newLineWord.correct.roma += romaPattern[0];
 
-  newLineWord.nextChar = newLineWord.word.shift() || {
+  newLineWord.nextChunk = newLineWord.wordChunks.shift() || {
     kana: "",
     romaPatterns: [""],
     point: 0,

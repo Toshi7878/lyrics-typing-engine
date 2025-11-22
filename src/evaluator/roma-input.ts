@@ -1,4 +1,4 @@
-import type { LineWord, TypeChunk } from "../type";
+import type { LineWord, WordChunk } from "../type";
 import type { TypingKey } from "./type";
 
 export const romaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey">) => {
@@ -25,7 +25,7 @@ const Z_COMMAND_MAP = {
     // point: CHAR_POINT * 2,
     type: "symbol" as const,
   },
-} satisfies Record<string, Omit<TypeChunk, "point">>;
+} satisfies Record<string, Omit<WordChunk, "point">>;
 
 const processedLineWord = (
   typingKeys: TypingKey,
@@ -33,31 +33,31 @@ const processedLineWord = (
 ): { newLineWord: LineWord; isUpdatePoint: boolean } => {
   const processNNRouteKey = (lineWord: LineWord) => {
     const newLineWord = { ...lineWord };
-    if (!newLineWord.word[0]) return { newLineWord: lineWord, isUpdatePoint: false };
+    if (!newLineWord.wordChunks[0]) return { newLineWord: lineWord, isUpdatePoint: false };
     newLineWord.correct.kana += "ん";
-    newLineWord.nextChar = newLineWord.word[0];
-    newLineWord.word.splice(0, 1);
+    newLineWord.nextChunk = newLineWord.wordChunks[0];
+    newLineWord.wordChunks.splice(0, 1);
     return { newLineWord, isUpdatePoint: true };
   };
 
   const zCommand = (lineWord: LineWord) => {
     const newLineWord = { ...lineWord };
-    const doublePeriod = newLineWord.nextChar.kana === "." && newLineWord.word[0]?.kana === ".";
-    const charPoint = newLineWord.nextChar.point;
+    const doublePeriod = newLineWord.nextChunk.kana === "." && newLineWord.wordChunks[0]?.kana === ".";
+    const charPoint = newLineWord.nextChunk.point;
     if (doublePeriod) {
-      const triplePeriod = doublePeriod && newLineWord.word[1]?.kana === ".";
+      const triplePeriod = doublePeriod && newLineWord.wordChunks[1]?.kana === ".";
       if (triplePeriod) {
-        newLineWord.nextChar = {
+        newLineWord.nextChunk = {
           ...structuredClone(Z_COMMAND_MAP["..."]),
           point: charPoint * 3,
         };
-        newLineWord.word.splice(0, 2);
+        newLineWord.wordChunks.splice(0, 2);
       } else {
-        newLineWord.nextChar = {
+        newLineWord.nextChunk = {
           ...structuredClone(Z_COMMAND_MAP[".."]),
           point: charPoint * 2,
         };
-        newLineWord.word.splice(0, 1);
+        newLineWord.wordChunks.splice(0, 1);
       }
     }
     return { newLineWord, isUpdatePoint: false };
@@ -70,10 +70,10 @@ const processedLineWord = (
     } as const;
     const expectedNextKey = expectedNextKeyMap[typingKeys.code];
     const isNNRoute =
-      lineWord.nextChar.kana === "ん" &&
+      lineWord.nextChunk.kana === "ん" &&
       lineWord.correct.roma.slice(-1) === "n" &&
-      lineWord.nextChar.romaPatterns[0] === "n";
-    const isNext = lineWord.word[0]?.kana === expectedNextKey;
+      lineWord.nextChunk.romaPatterns[0] === "n";
+    const isNext = lineWord.wordChunks[0]?.kana === expectedNextKey;
 
     if (isNNRoute && isNext) {
       return processNNRouteKey(lineWord);
@@ -102,8 +102,8 @@ export const romaInput = (
     ...lineWord,
   });
 
-  const nextRomaPattern: string[] = newLineWord.nextChar.romaPatterns;
-  const kana = lineWord.nextChar.kana;
+  const nextRomaPattern: string[] = newLineWord.nextChunk.romaPatterns;
+  const kana = lineWord.nextChunk.kana;
   const isSuccess = nextRomaPattern.some((pattern) => pattern[0] && pattern[0].toLowerCase() === typingKeys.keys[0]);
 
   if (!isSuccess || !typingKeys.keys[0]) {
@@ -115,11 +115,11 @@ export const romaInput = (
     };
   }
 
-  if (kana === "ん" && newLineWord.word[0]) {
-    newLineWord.word[0].romaPatterns = nextNNFilter(typingKeys.keys[0], newLineWord.word[0].romaPatterns);
+  if (kana === "ん" && newLineWord.wordChunks[0]) {
+    newLineWord.wordChunks[0].romaPatterns = nextNNFilter(typingKeys.keys[0], newLineWord.wordChunks[0].romaPatterns);
   }
 
-  newLineWord.nextChar.romaPatterns = updateNextRomaPattern(typingKeys.keys[0], nextRomaPattern);
+  newLineWord.nextChunk.romaPatterns = updateNextRomaPattern(typingKeys.keys[0], nextRomaPattern);
 
   newLineWord = kanaFilter(kana, typingKeys.keys[0], newLineWord);
   const result = wordUpdate(typingKeys.keys[0], newLineWord, isUpdatePoint);
@@ -134,14 +134,14 @@ const updateNextRomaPattern = (eventKey: TypingKey["keys"][number], nextRomaPatt
 };
 
 const kanaFilter = (kana: string, eventKey: TypingKey["keys"][number], newLineWord: LineWord) => {
-  const romaPattern = newLineWord.nextChar.romaPatterns;
+  const romaPattern = newLineWord.nextChunk.romaPatterns;
   if (kana.length >= 2 && romaPattern[0]) {
     const isSokuon = kana[0] === "っ" && (eventKey === "u" || romaPattern[0][0] === eventKey);
     const isYoon = kana[0] !== "っ" && (romaPattern[0][0] === "x" || romaPattern[0][0] === "l");
 
     if (isSokuon || isYoon) {
-      newLineWord.correct.kana += newLineWord.nextChar.kana.slice(0, 1);
-      newLineWord.nextChar.kana = newLineWord.nextChar.kana.slice(1);
+      newLineWord.correct.kana += newLineWord.nextChunk.kana.slice(0, 1);
+      newLineWord.nextChunk.kana = newLineWord.nextChunk.kana.slice(1);
     }
   }
 
@@ -161,14 +161,14 @@ const nextNNFilter = (eventKey: TypingKey["keys"][number], nextToNextChar: strin
 };
 
 const wordUpdate = (eventKey: TypingKey["key"][number], newLineWord: LineWord, _isUpdatePoint: boolean) => {
-  const kana = newLineWord.nextChar.kana;
-  const romaPattern = newLineWord.nextChar.romaPatterns;
+  const kana = newLineWord.nextChunk.kana;
+  const romaPattern = newLineWord.nextChunk.romaPatterns;
   let isUpdatePoint = _isUpdatePoint;
 
   if (!romaPattern.length) {
     newLineWord.correct.kana += kana;
     isUpdatePoint = true;
-    newLineWord.nextChar = newLineWord.word.shift() || {
+    newLineWord.nextChunk = newLineWord.wordChunks.shift() || {
       kana: "",
       romaPatterns: [""],
       point: 0,

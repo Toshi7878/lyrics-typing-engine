@@ -14,9 +14,9 @@ export const evaluateRomaTypingInput = (
     newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChar.type,
-    isCompleted: newLineWord.nextChar.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChar.point : 0,
+    charType: lineWord.nextChunk.type,
+    isCompleted: newLineWord.nextChunk.kana === "",
+    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
   };
 };
 
@@ -31,9 +31,9 @@ export const evaluateKanaTypingInput = (
     newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChar.type,
-    isCompleted: newLineWord.nextChar.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChar.point : 0,
+    charType: lineWord.nextChunk.type,
+    isCompleted: newLineWord.nextChunk.kana === "",
+    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
   };
 };
 
@@ -49,9 +49,9 @@ export const evaluateTypingInput = (
     newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChar.type,
-    isCompleted: newLineWord.nextChar.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChar.point : 0,
+    charType: lineWord.nextChunk.type,
+    isCompleted: newLineWord.nextChunk.kana === "",
+    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
   };
 };
 

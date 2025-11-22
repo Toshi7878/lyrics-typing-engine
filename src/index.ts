@@ -1,6 +1,6 @@
 export { buildTypingMap } from "./build-typing-map/build-map";
-export { generateTypingWord } from "./build-typing-map/generate-typing-word";
-export { sentenceToKanaChunkWords } from "./build-typing-map/sentence-to-kana-chunk-words";
+export { buildTypingWord } from "./build-typing-map/build-word";
+export { parseKanaChunks } from "./build-typing-map/parse-kana-chunks";
 export { isTypingKey } from "./evaluator/is-typing-key";
 export type { TypingEvaluationResult, TypingKey } from "./evaluator/type";
 export {
@@ -13,5 +13,5 @@ export type {
   InputMode,
   LineWord,
   MapJsonLine,
-  TypeChunk,
+  WordChunk,
 } from "./type";

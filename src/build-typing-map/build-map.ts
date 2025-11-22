@@ -1,8 +1,8 @@
-import type { BuiltMapLine, MapJsonLine, TypeChunk } from "../type";
+import type { BuiltMapLine, MapJsonLine, WordChunk } from "../type";
 import { zip } from "../utils/array";
 import { countKanaWordWithDakuonSplit } from "../utils/kana";
-import { generateTypingWord } from "./generate-typing-word";
-import { sentenceToKanaChunkWords } from "./sentence-to-kana-chunk-words";
+import { buildTypingWord } from "./build-word";
+import { parseKanaChunks } from "./parse-kana-chunks";
 
 export const buildTypingMap = <TOptions = unknown>({
   mapJson,
@@ -13,20 +13,20 @@ export const buildTypingMap = <TOptions = unknown>({
 }): BuiltMapLine<TOptions>[] => {
   const wordsData: BuiltMapLine<TOptions>[] = [];
 
-  const kanaChunkWords = sentenceToKanaChunkWords(mapJson.map((line) => line.word).join("\n"));
-  for (const [i, [mapLine, kanaChunkWord]] of zip(mapJson, kanaChunkWords).entries()) {
+  const kanaChunks = parseKanaChunks(mapJson.map((line) => line.word).join("\n"));
+  for (const [i, [mapLine, kanaChunkWord]] of zip(mapJson, kanaChunks).entries()) {
     const line = {
       time: Number(mapLine.time),
       lyrics: mapLine.lyrics,
-      word: generateTypingWord({ kanaChunkWord, charPoint }),
       kanaWord: kanaChunkWord.join(""),
+      wordChunks: buildTypingWord({ kanaChunkWord, charPoint }),
       options: mapLine.options,
     };
 
     const hasWord = !!kanaChunkWord.length;
     const nextLine = mapJson[i + 1];
     if (hasWord && line.lyrics !== "end" && nextLine) {
-      const notes = calcLineNotes(line.word);
+      const notes = calcLineNotes(line.wordChunks);
       wordsData.push({
         kpm: calcLineKpm({
           notes,
@@ -53,7 +53,7 @@ const calcLineKpm = ({ notes, lineDuration: remainTime }: { notes: BuiltMapLine[
   return { roma: romaKpm, kana: kanaKpm };
 };
 
-const calcLineNotes = (word: TypeChunk[]) => {
+const calcLineNotes = (word: WordChunk[]) => {
   const kanaWord = word.map((item) => item.kana).join("");
   const kanaNotes = countKanaWordWithDakuonSplit({ kanaWord });
   const romaNotes = word.map((item) => item.romaPatterns[0]).join("").length;

@@ -106,15 +106,15 @@ document.addEventListener('keydown', (event) => {
 
 `parseKanaChunks()` - かなチャンク変換
 
-`parseRomaPatterns()` - タイピングローマ字チャンク生成
+`parseKanaToWordChunks()` - タイピングローマ字チャンク生成
 
 ```typescript
-import { parseRomaPatterns } from 'lyrics-typing-engine';
+import { parseKanaToWordChunks } from 'lyrics-typing-engine';
 
-const kanaWordChunks = parseKanaChunks("きゅっとひもをしばる");
+const kanaChunks = parseKanaChunks("きゅっとひもをしばる");
 // ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
 
-const wordChunks = parseRomaPatterns({ kanaWordChunks, charPoint: 50 });
+const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint: 50 });
 
 /**
  * [

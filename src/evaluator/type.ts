@@ -1,13 +1,13 @@
 import type { TypingWord, WordChunk } from "../type";
 
-export interface TypingKey {
-  keys: string[];
+export interface TypingInput {
+  inputChars: string[];
   key: string;
   code: string;
   shift?: boolean;
 }
 
-export interface TypingEvaluationResult {
+export interface TypingResult {
   nextTypingWord: TypingWord;
   successKey: string | undefined;
   failKey: string | undefined;

@@ -1,50 +1,50 @@
 import type { Dakuten, HanDakuten, NormalizeHirakana, TypingWord } from "../type";
 import { CODE_TO_KANA, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
-import type { TypingKey } from "./type";
+import type { TypingInput } from "./type";
 
-export const kanaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">) => {
+export const kanaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">): TypingInput => {
   const codeKanaKey = CODE_TO_KANA.get(event.code);
   const keyToKanaResult = KEY_TO_KANA.get(event.key) ?? [""];
   const input = {
-    keys: codeKanaKey ? [...codeKanaKey] : [...keyToKanaResult],
+    inputChars: codeKanaKey ? [...codeKanaKey] : [...keyToKanaResult],
     key: event.key.toLowerCase(),
     code: event.code,
     shift: event.shiftKey,
   };
 
   if (event.keyCode === 0) {
-    input.keys = ["ー", "￥", "\\"];
+    input.inputChars = ["ー", "￥", "\\"];
   } else if (event.shiftKey) {
     if (event.code === "KeyE") {
-      input.keys[0] = "ぃ";
+      input.inputChars[0] = "ぃ";
     }
     if (event.code === "KeyZ") {
-      input.keys[0] = "っ";
+      input.inputChars[0] = "っ";
     }
 
     //ATOK入力 https://support.justsystems.com/faq/1032/app/servlet/qadoc?QID=024273
     if (event.code === "KeyV") {
-      input.keys.push("ゐ", "ヰ");
+      input.inputChars.push("ゐ", "ヰ");
     }
     if (event.code === "Equal") {
-      input.keys.push("ゑ", "ヱ");
+      input.inputChars.push("ゑ", "ヱ");
     }
     if (event.code === "KeyT") {
-      input.keys.push("ヵ");
+      input.inputChars.push("ヵ");
     }
     if (event.code === "Quote") {
-      input.keys.push("ヶ");
+      input.inputChars.push("ヶ");
     }
     if (event.code === "KeyF") {
-      input.keys.push("ゎ");
+      input.inputChars.push("ゎ");
     }
     if (event.code === "Digit0") {
-      input.keys = ["を"];
+      input.inputChars = ["を"];
     }
   }
 
   if (KEYBOARD_CHARS.includes(event.key)) {
-    input.keys.push(
+    input.inputChars.push(
       event.key.toLowerCase(),
       event.key.toLowerCase().replace(event.key.toLowerCase(), (s) => {
         return String.fromCharCode(s.charCodeAt(0) + 0xfee0);
@@ -66,7 +66,7 @@ const HANDAKU_LIST: HanDakuten[] = ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
 const DAKU_HANDAKU_LIST = [...DAKU_LIST, ...HANDAKU_LIST];
 
 export const kanaInput = (
-  typingKeys: TypingKey,
+  typingInput: TypingInput,
   lineWord: TypingWord,
 ): {
   newLineWord: TypingWord;
@@ -78,7 +78,7 @@ export const kanaInput = (
 
   const nextKana = lineWord.nextChunk.kana;
   const firstKanaChar = nextKana.charAt(0);
-  const { keys } = typingKeys;
+  const { inputChars } = typingInput;
   const isdakuHandaku = DAKU_HANDAKU_LIST.some((char) => char === firstKanaChar);
 
   const dakuHanDakuData: DakuHandakuData | undefined = isdakuHandaku
@@ -86,20 +86,20 @@ export const kanaInput = (
     : undefined;
 
   const successIndex: number = firstKanaChar
-    ? keys.indexOf(dakuHanDakuData?.normalizedKana ? dakuHanDakuData.normalizedKana : firstKanaChar.toLowerCase())
+    ? inputChars.indexOf(dakuHanDakuData?.normalizedKana ? dakuHanDakuData.normalizedKana : firstKanaChar.toLowerCase())
     : -1;
 
   const typingKey =
-    keys[successIndex] === "゛" || keys[successIndex] === "゜"
+    inputChars[successIndex] === "゛" || inputChars[successIndex] === "゜"
       ? newLineWord.nextChunk.originalDakutenChar
-      : keys[successIndex];
+      : inputChars[successIndex];
 
   if (!typingKey) {
     const isKanaInArray = !KEYBOARD_CHARS.includes(firstKanaChar);
     return {
       newLineWord,
       successKey: "",
-      failKey: isKanaInArray ? typingKeys.keys[0] : typingKeys.key,
+      failKey: isKanaInArray ? typingInput.inputChars[0] : typingInput.key,
       isUpdatePoint: false,
     };
   }
@@ -113,12 +113,12 @@ export const kanaInput = (
     newLineWord.nextChunk.kana = newLineWord.nextChunk.kana.slice(1);
   } else {
     const result = wordUpdate(typingKey, newLineWord);
-    return { ...result, successKey: keys[successIndex], failKey: undefined };
+    return { ...result, successKey: inputChars[successIndex], failKey: undefined };
   }
 
   return {
     newLineWord,
-    successKey: keys[successIndex],
+    successKey: inputChars[successIndex],
     failKey: undefined,
     isUpdatePoint: false,
   };

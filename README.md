@@ -122,8 +122,6 @@ const timer = () => {
 
 `evaluateKanaInput(event: KeyboardEvent, typingWord: TypingWord)` - かな入力時の判定
 
-`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, typingWord: TypingWord)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
-
 ```typescript
 import { isTypingKey, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
 
@@ -164,9 +162,56 @@ document.addEventListener('keydown', (event) => {
  */
 ```
 
-### 文字列からタイピングワードの生成 (タイピング中の入力モード切り替え機能などで使用)
+### 任意の文字での入力判定
+
+`executeTypingInput(inputChar: string, inputMode: InputMode, typingWord: TypingWord)`
+
+リプレイ再生などに活用できます
+
+```typescript
+import { executeTypingInput } from 'lyrics-typing-engine';
+
+const replayData = [
+  mode: "roma",
+  typeResults: [
+    { time: 0, inputChar: "c", }
+    { time: 1, inputChar: "o", }
+    { time: 2, inputChar: "n", }
+  ]
+];
+
+const typeResults = replayData[0].typeResults;
+const typingResult = executeTypingInput(typeResults[0].inputChar, "roma", typingWord);
+console.log(typingResult);
+
+/**
+ * {
+ *   nextTypingWord: {
+ *     correct: { kana: "", roma: "c" },
+ *     nextChunk: { kana: "こ", romaPatterns: ["o"], point: 100, type: "kana" },
+ *     wordChunks: [
+ *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
+ *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
+ *       { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
+ *       { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" },
+ *     ]
+ *   },
+ *   successKey: "c",
+ *   failKey: undefined,
+ *   chunkType: "kana",
+ *   isCompleted: false,
+ *   updatePoint: 0
+ * }
+ */
+
+```
+
+### 文字列からタイピングワードの生成
 
 `parseWordToChunks(word: string, charPoint: number)` - 文字列からタイピングワードを生成
+
+タイピング中の入力モード切り替え機能などで活用できます
+
 ```typescript
 import { parseWordToChunks } from 'lyrics-typing-engine';
 
@@ -245,24 +290,6 @@ interface WordChunk {
   type: "kana" | "alphabet" | "num" | "symbol" | "space" | undefined; // タイピングチャンクの種類
 }
 
-// タイピング入力時の判定 型
-interface TypingEvaluationResult {
-  nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
-  successKey: string | undefined; // 正解時の入力キー
-  failKey: string | undefined; // ミス時の入力キー
-  chunkType: WordChunk["type"]; // 入力したタイピングチャンクの種類
-  isCompleted: boolean; // 打ち切り判定
-  updatePoint: number; // 加算ポイント
-}
-
-// タイピングキー 型
-interface TypingKey {
-  key: string; // 入力キー
-  code: string; // 入力コード
-  shiftKey: boolean; // Shiftキーの状態
-  keyCode: number; // 入力キーのコード
-}
-
 // タイピングモード 型
 type InputMode = "roma" | "kana";
 
@@ -272,6 +299,18 @@ interface TypingWord {
   nextChunk: WordChunk; // 次のタイピングチャンク
   wordChunks: WordChunk[]; // 残りタイピングワード
 }
+
+// タイピング入力時の判定 型
+interface TypingResult {
+  nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
+  successKey: string | undefined; // 正解時の入力キー
+  failKey: string | undefined; // ミス時の入力キー
+  chunkType: WordChunk["type"]; // 入力したタイピングチャンクの種類
+  isCompleted: boolean; // 打ち切り判定
+  updatePoint: number; // 加算ポイント
+}
+
+
 
 
 

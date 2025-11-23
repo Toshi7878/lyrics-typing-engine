@@ -1,14 +1,14 @@
 import type { InputMode, TypingWord } from "../type";
 import { kanaInput, kanaMakeInput } from "./kana-input";
 import { romaInput, romaMakeInput } from "./roma-input";
-import type { TypingEvaluationResult, TypingKey } from "./type";
+import type { TypingInput, TypingResult } from "./type";
 
 export const evaluateRomaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
   typingWord: TypingWord,
-): TypingEvaluationResult => {
-  const typingKey = romaMakeInput(event);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingKey, { ...typingWord });
+): TypingResult => {
+  const typingInput = romaMakeInput(event);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingInput, { ...typingWord });
 
   return {
     nextTypingWord: newLineWord,
@@ -23,9 +23,9 @@ export const evaluateRomaInput = (
 export const evaluateKanaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
   typingWord: TypingWord,
-): TypingEvaluationResult => {
-  const typingKey = kanaMakeInput(event);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingKey, { ...typingWord });
+): TypingResult => {
+  const typingInput = kanaMakeInput(event);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingInput, { ...typingWord });
 
   return {
     nextTypingWord: newLineWord,
@@ -37,13 +37,15 @@ export const evaluateKanaInput = (
   };
 };
 
-export const evaluateTypingInput = (
-  typingKeys: TypingKey,
-  inputMode: InputMode,
-  typingWord: TypingWord,
-): TypingEvaluationResult => {
+export const executeTypingInput = (inputChar: string, inputMode: InputMode, typingWord: TypingWord): TypingResult => {
+  const typingInput: TypingInput = {
+    inputChars: [inputChar],
+    key: inputChar,
+    code: `Key${inputChar.toUpperCase()}`,
+  };
+
   const { newLineWord, successKey, failKey, isUpdatePoint } =
-    inputMode === "roma" ? romaInput(typingKeys, { ...typingWord }) : kanaInput(typingKeys, { ...typingWord });
+    inputMode === "roma" ? romaInput(typingInput, { ...typingWord }) : kanaInput(typingInput, { ...typingWord });
 
   return {
     nextTypingWord: newLineWord,

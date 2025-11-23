@@ -30,7 +30,7 @@ const mapJson: MapJsonLine[] = [
   { time: 6.0, lyrics: "end", word: "" }
 ];
 
-const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
+const builtMapLines = buildTypingMap({ mapJson, charPoint: 50 });
 
 /**
  * [
@@ -78,23 +78,23 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  */
 ```
 
-### タイピングワードの初期状態の作成
+### 歌詞フレーズ切り替わり時のタイピングワード更新
 
-`createWordState(mapLine: BuiltMapLine)` - タイピングワードの初期状態の作成
+`createTypingWord(builtMapLine: BuiltMapLine)` - builtMapLinesの行から次のフレーズのタイピングワードを作成
 
 ```typescript
-import { createWordState } from 'lyrics-typing-engine';
+import { createTypingWord } from 'lyrics-typing-engine';
 
 const count = 0;
 
 const timer = () => {
   const currentTime = video.getCurrentTime();
-  const nextLine = builtMap[count + 1]
+  const nextLine = builtMapLines[count + 1];
 
   if (currentTime >= nextLine.time) {
     count++;
-    const newWordState = createWordState(nextLine);
-    setWordState(newWordState);
+    const newTypingWord = createTypingWord(nextLine);
+    setTypingWord(newTypingWord);
   }
 
 }
@@ -112,38 +112,38 @@ const timer = () => {
 
 `isTypingKey(event: KeyboardEvent)` - イベント時の文字入力キー判定
 
-`evaluateRomaInput(event: KeyboardEvent, wordState: TypingWordState)` - ローマ字入力時の判定
+`evaluateRomaInput(event: KeyboardEvent, typingWord: TypingWord)` - ローマ字入力時の判定
 
-`evaluateKanaInput(event: KeyboardEvent, wordState: TypingWordState)` - かな入力時の判定
+`evaluateKanaInput(event: KeyboardEvent, typingWord: TypingWord)` - かな入力時の判定
 
-`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, wordState: TypingWordState)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
+`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, typingWord: TypingWord)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
 
 ```typescript
-import { buildTypingMap, createWordState, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
+import { buildTypingMap, createTypingWord, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
 
-const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
+const builtMapLines = buildTypingMap({ mapJson, charPoint: 50 });
 const inputMode = "roma";
 
 document.addEventListener('keydown', (event) => {
   if (!isTypingKey(event)) return;
+  const typingWord = readTypingWord();
 
     const typingResult =
-      inputMode === "roma" ? evaluateRomaInput(event, currentWordState) : evaluateKanaInput(event, currentWordState);
+      inputMode === "roma" ? evaluateRomaInput(event, typingWord) : evaluateKanaInput(event, typingWord);
 
   if (typingResult.successKey) {
     // 正解時の処理
-    setWordState(typingResult.nextWordState);
+    setTypingWord(typingResult.nextTypingWord);
   } else if (typingResult.failKey) {
     // ミス時の処理
   }
 });
 ```
 
-### タイピングワードの生成
+### 文字列からwordChunksの生成 (タイピング中の入力モード切り替え機能などで使用)
 
-`parseKanaChunks()` - かなチャンク変換
-
-`parseKanaToWordChunks()` - タイピングローマ字チャンク生成
+`parseKanaChunks()` - かな文字列からかなチャンク配列を生成
+`parseKanaToWordChunks()` - かなチャンク配列からタイピングローマ字チャンク配列を生成
 
 ```typescript
 import { parseKanaToWordChunks } from 'lyrics-typing-engine';
@@ -188,7 +188,7 @@ const mapJson: MapJsonLine<MyOptions>[] = [
   }
 ];
 
-const builtMap = buildTypingMap<MyOptions>({ mapJson, charPoint: 0 });
+const builtMapLines = buildTypingMap<MyOptions>({ mapJson, charPoint: 0 });
 ```
 
 ## import 可能な型
@@ -225,7 +225,7 @@ interface WordChunk {
 
 // タイピング入力時の判定 型
 interface TypingEvaluationResult {
-  nextWordState: TypingWordState; // 更新後のタイピングワード (ミス時は実質更新されません)
+  nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー
   charType: WordChunk["type"]; // 入力したタイピングチャンクの種類
@@ -245,7 +245,7 @@ interface TypingKey {
 type InputMode = "roma" | "kana";
 
 // タイピングワード 型
-interface TypingWordState {
+interface TypingWord {
   correct: { kana: string; roma: string }; // 正解したローマ字・かな
   nextChunk: WordChunk; // 次のタイピングチャンク
   wordChunks: WordChunk[]; // 残りタイピングワード

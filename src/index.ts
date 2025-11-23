@@ -1,7 +1,7 @@
 export { buildTypingMap } from "./build-typing-map/build-map";
 export { parseKanaChunks } from "./build-typing-map/parse-kana-chunks";
 export { parseKanaToWordChunks } from "./build-typing-map/parse-kana-to-word-chunks";
-export { createWordState } from "./create-word-state/create-word-state";
+export { createTypingWord } from "./create-typing-word/create-typing-word";
 export { isTypingKey } from "./evaluator/is-typing-key";
 export type { TypingEvaluationResult, TypingKey } from "./evaluator/type";
 export {
@@ -13,6 +13,6 @@ export type {
   BuiltMapLine,
   InputMode,
   MapJsonLine,
-  TypingWordState,
+  TypingWord as TypingWordState,
   WordChunk,
 } from "./type";

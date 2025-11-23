@@ -172,15 +172,15 @@ import { executeTypingInput } from 'lyrics-typing-engine';
 const replayData = [
   startInputMode: "roma",
   typeResults: [
-    { time: 0, inputChar: "c", isSuccess: true }
-    { time: 1, inputChar: "o", isSuccess: true }
-    { time: 2, inputChar: "a", isSuccess: false }
+    { time: 0, char: "c", isSuccess: true }
+    { time: 1, char: "o", isSuccess: true }
+    { time: 2, char: "a", isSuccess: false }
   ]
 ];
 
 const typeResults = replayData[0].typeResults;
 const inputMode = replayData[0].startInputMode;
-const typingResult = executeTypingInput(typeResults[0].inputChar, inputMode, typingWord);
+const typingResult = executeTypingInput(typeResults[0].char, inputMode, typingWord);
 console.log(typingResult);
 
 /**

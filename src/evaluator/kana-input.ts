@@ -91,7 +91,7 @@ export const kanaInput = (
 
   const typingKey =
     keys[successIndex] === "゛" || keys[successIndex] === "゜"
-      ? newLineWord.nextChunk.orginalDakuChar
+      ? newLineWord.nextChunk.originalDakutenChar
       : keys[successIndex];
 
   if (!typingKey) {
@@ -107,7 +107,7 @@ export const kanaInput = (
   if (dakuHanDakuData?.type) {
     const yoon = nextKana.length >= 2 && dakuHanDakuData.type ? nextKana[1] : "";
     newLineWord.nextChunk.kana = dakuHanDakuData.type + yoon;
-    newLineWord.nextChunk.orginalDakuChar = dakuHanDakuData.originalKana as Dakuten | HanDakuten;
+    newLineWord.nextChunk.originalDakutenChar = dakuHanDakuData.originalKana as Dakuten | HanDakuten;
   } else if (nextKana.length >= 2) {
     newLineWord.correct.kana += typingKey;
     newLineWord.nextChunk.kana = newLineWord.nextChunk.kana.slice(1);

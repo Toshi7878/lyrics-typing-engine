@@ -17,7 +17,7 @@ export interface WordChunk {
 
 export interface TypingWord {
   correct: { kana: string; roma: string };
-  nextChunk: WordChunk & { orginalDakuChar?: Dakuten | HanDakuten };
+  nextChunk: WordChunk & { originalDakutenChar?: Dakuten | HanDakuten };
   wordChunks: WordChunk[];
 }
 

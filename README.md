@@ -172,9 +172,9 @@ import { executeTypingInput } from 'lyrics-typing-engine';
 const replayData = [
   startInputMode: "roma",
   typeResults: [
-    { time: 0, inputChar: "c", }
-    { time: 1, inputChar: "o", }
-    { time: 2, inputChar: "n", }
+    { time: 0, inputChar: "c", isSuccess: true }
+    { time: 1, inputChar: "o", isSuccess: true }
+    { time: 2, inputChar: "n", isSuccess: true }
   ]
 ];
 

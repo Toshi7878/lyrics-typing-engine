@@ -104,7 +104,12 @@ const timer = () => {
  * {
  *   correct: { kana: "", roma: "" },
  *   nextChunk: { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
- *   wordChunks: [{ kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" }, { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" }, { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" }, { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" } ]
+ *   wordChunks: [
+ *     { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
+ *     { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
+ *     { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
+ *     { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" }
+ *   ]
  * }
  */
 ```
@@ -144,7 +149,11 @@ document.addEventListener('keydown', (event) => {
  *   nextTypingWord: {
  *     correct: { kana: "こ", roma: "co" },
  *     nextChunk: { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
- *     wordChunks: [{ kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" }, { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" }, { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" } ]
+ *     wordChunks: [
+ *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
+ *       { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
+ *       { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" }
+ *     ]
  *   },
  *   successKey: "o",
  *   failKey: undefined,
@@ -162,20 +171,23 @@ document.addEventListener('keydown', (event) => {
 import { parseWordToChunks } from 'lyrics-typing-engine';
 
 const wordChunks = parseWordToChunks({ word: "きゅっとひもをしばる", charPoint: 50 });
-console.log(wordChunks);
-/**
- * [
- *   { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
- *   { kana: "っと", romaPatterns: ["tto", "ltutto", "xtutto", "ltsutto", "xtsutto"], point: 150, type: "kana" },
- *   { kana: "ひ", romaPatterns: ["hi"], point: 100, type: "kana" },
- *   { kana: "も", romaPatterns: ["mo"], point: 100, type: "kana" },
- *   { kana: "を", romaPatterns: ["wo"], point: 100, type: "kana" },
- *   { kana: "し", romaPatterns: ["si", "shi", "ci"], point: 100, type: "kana" },
- *   { kana: "ば", romaPatterns: ["ba"], point: 100, type: "kana" },
- *   { kana: "る", romaPatterns: ["ru"], point: 100, type: "kana" }
- * ]
- */
 
+console.log(createTypingWord({ wordChunks }));
+/**
+ * {
+ *   correct: { kana: "", roma: "" },
+ *   nextChunk: { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
+ *   wordChunks: [
+ *     { kana: "っと", romaPatterns: ["tto", "ltutto", "xtutto", "ltsutto", "xtsutto"], point: 150, type: "kana" },
+ *     { kana: "ひ", romaPatterns: ["hi"], point: 100, type: "kana" },
+ *     { kana: "も", romaPatterns: ["mo"], point: 100, type: "kana" },
+ *     { kana: "を", romaPatterns: ["wo"], point: 100, type: "kana" },
+ *     { kana: "し", romaPatterns: ["si", "shi", "ci"], point: 100, type: "kana" },
+ *     { kana: "ば", romaPatterns: ["ba"], point: 100, type: "kana" },
+ *     { kana: "る", romaPatterns: ["ru"], point: 100, type: "kana" }
+ *   ]
+ * }
+ */
 
 ```
 

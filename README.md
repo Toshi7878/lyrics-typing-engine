@@ -157,17 +157,11 @@ document.addEventListener('keydown', (event) => {
 
 ### 文字列からwordChunksの生成 (タイピング中の入力モード切り替え機能などで使用)
 
-`parseKanaChunks()` - かな文字列からかなチャンク配列を生成
-`parseKanaToWordChunks()` - かなチャンク配列からタイピングローマ字チャンク配列を生成
-
+`parseWordToChunks(word: string, charPoint: number)` - 文字列からwordChunksを生成
 ```typescript
-import { parseKanaToWordChunks } from 'lyrics-typing-engine';
+import { parseWordToChunks } from 'lyrics-typing-engine';
 
-const kanaChunks = parseKanaChunks("きゅっとひもをしばる");
-console.log(kanaChunks);
-// ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
-
-const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint: 50 });
+const wordChunks = parseWordToChunks({ word: "きゅっとひもをしばる", charPoint: 50 });
 console.log(wordChunks);
 /**
  * [

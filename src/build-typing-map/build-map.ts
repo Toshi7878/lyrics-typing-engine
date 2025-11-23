@@ -2,7 +2,7 @@ import type { BuiltMapLine, RawMapLine, WordChunk } from "../type";
 import { zip } from "../utils/array";
 import { countKanaWordWithDakuonSplit } from "../utils/kana";
 import { parseKanaChunks } from "./parse-kana-chunks";
-import { parseKanaToWordChunks } from "./parse-kana-to-word-chunks";
+import { parseKanaChunksToWordChunks } from "./parse-kana-chunks-to-word-chunks";
 
 export const buildTypingMap = <TOptions = unknown>({
   rawMapLines,
@@ -15,7 +15,7 @@ export const buildTypingMap = <TOptions = unknown>({
 
   const kanaChunksLines = parseKanaChunks(rawMapLines.map((line) => line.word).join("\n"));
   for (const [i, [rawMapLine, kanaChunks]] of zip(rawMapLines, kanaChunksLines).entries()) {
-    const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint });
+    const wordChunks = parseKanaChunksToWordChunks({ kanaChunks, charPoint });
     const nextLine = rawMapLines[i + 1];
     const lineDuration = nextLine ? Math.floor((Number(nextLine.time) - Number(rawMapLine.time)) * 1000) / 1000 : 0;
 

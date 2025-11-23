@@ -1,6 +1,8 @@
 import type { BuiltMapLine, TypingWord } from "../type";
 
-export const createTypingWord = <TOptions = unknown>(builtMapLine: BuiltMapLine<TOptions>): TypingWord => {
+export const createTypingWord = <TOptions = unknown>(
+  builtMapLine: Pick<BuiltMapLine<TOptions>, "wordChunks">,
+): TypingWord => {
   if (builtMapLine.wordChunks.length === 0) {
     return {
       correct: { kana: "", roma: "" },

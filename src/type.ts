@@ -1,6 +1,6 @@
 export type InputMode = "roma" | "kana" | "flick";
 
-export interface MapJsonLine<TOptions = unknown> {
+export interface RawMapLine<TOptions = unknown> {
   time: string | number;
   lyrics: string;
   word: string;

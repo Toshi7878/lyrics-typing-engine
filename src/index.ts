@@ -12,7 +12,7 @@ export {
 export type {
   BuiltMapLine,
   InputMode,
-  MapJsonLine,
-  TypingWord as TypingWordState,
+  RawMapLine,
+  TypingWord,
   WordChunk,
 } from "./type";

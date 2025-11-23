@@ -14,23 +14,23 @@ npm install lyrics-typing-engine
 
 `buildTypingMap()`
 
-`mapJson` - タイムタグ付きタイピング譜面データ
+`rawMapLines` - ビルド前のタイピング譜面データ
 
 `charPoint` - ローマ字換算での1打鍵あたりのポイント
 
 ```typescript
-import { buildTypingMap, type MapJsonLine } from 'lyrics-typing-engine';
+import { buildTypingMap, type RawMapLine } from 'lyrics-typing-engine';
 
 /**
- * @note 重要: タイムタグ付きJsonデータはtime:0から始まり、最後の歌詞は"end"にする必要があります。
+ * @note 重要: タイピング譜面データはtime:0から始まり、最後の歌詞は"end"にする必要があります。
  */
-const mapJson: MapJsonLine[] = [
+const rawMapLines: RawMapLine[] = [
   { time: 0, lyrics: "こんにちは", word: "こんにちは" },
   { time: 3.5, lyrics: "世界", word: "せかい" },
   { time: 6.0, lyrics: "end", word: "" }
 ];
 
-const builtMapLines = buildTypingMap({ mapJson, charPoint: 50 });
+const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
 
 /**
  * [
@@ -121,7 +121,7 @@ const timer = () => {
 ```typescript
 import { buildTypingMap, createTypingWord, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
 
-const builtMapLines = buildTypingMap({ mapJson, charPoint: 50 });
+const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
 const inputMode = "roma";
 
 document.addEventListener('keydown', (event) => {
@@ -179,7 +179,7 @@ interface MyOptions {
   changeVideoSpeed?: number;
 }
 
-const mapJson: MapJsonLine<MyOptions>[] = [
+const rawMapLines: RawMapLine<MyOptions>[] = [
   {
     time: 0,
     lyrics: "歌詞",
@@ -188,14 +188,14 @@ const mapJson: MapJsonLine<MyOptions>[] = [
   }
 ];
 
-const builtMapLines = buildTypingMap<MyOptions>({ mapJson, charPoint: 0 });
+const builtMapLines = buildTypingMap<MyOptions>({ rawMapLines, charPoint: 0 });
 ```
 
 ## import 可能な型
 
 ```typescript
-// タイムタグ付きJsonデータ型
-interface MapJsonLine<TOptions = unknown> {
+// ビルド前タイピング譜面データ型
+interface RawMapLine<TOptions = unknown> {
   time: string | number; // 時間(ミリ秒)
   lyrics: string; // 歌詞
   word: string; // ひらがなで記述されたタイピングワード

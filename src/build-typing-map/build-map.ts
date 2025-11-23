@@ -1,44 +1,44 @@
-import type { BuiltMapLine, MapJsonLine, WordChunk } from "../type";
+import type { BuiltMapLine, RawMapLine, WordChunk } from "../type";
 import { zip } from "../utils/array";
 import { countKanaWordWithDakuonSplit } from "../utils/kana";
 import { parseKanaChunks } from "./parse-kana-chunks";
 import { parseKanaToWordChunks } from "./parse-kana-to-word-chunks";
 
 export const buildTypingMap = <TOptions = unknown>({
-  mapJson,
+  rawMapLines,
   charPoint,
 }: {
-  mapJson: MapJsonLine<TOptions>[];
+  rawMapLines: RawMapLine<TOptions>[];
   charPoint: number;
 }): BuiltMapLine<TOptions>[] => {
-  const wordsData: BuiltMapLine<TOptions>[] = [];
+  const builtMapLines: BuiltMapLine<TOptions>[] = [];
 
-  const kanaChunksLines = parseKanaChunks(mapJson.map((line) => line.word).join("\n"));
-  for (const [i, [mapLine, kanaChunks]] of zip(mapJson, kanaChunksLines).entries()) {
+  const kanaChunksLines = parseKanaChunks(rawMapLines.map((line) => line.word).join("\n"));
+  for (const [i, [rawMapLine, kanaChunks]] of zip(rawMapLines, kanaChunksLines).entries()) {
     const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint });
-    const nextLine = mapJson[i + 1];
-    const lineDuration = nextLine ? Math.floor((Number(nextLine.time) - Number(mapLine.time)) * 1000) / 1000 : 0;
+    const nextLine = rawMapLines[i + 1];
+    const lineDuration = nextLine ? Math.floor((Number(nextLine.time) - Number(rawMapLine.time)) * 1000) / 1000 : 0;
 
-    const line = {
-      time: Number(mapLine.time),
+    const builtLine = {
+      time: Number(rawMapLine.time),
       duration: lineDuration,
       wordChunks,
-      lyrics: mapLine.lyrics,
+      lyrics: rawMapLine.lyrics,
       kanaLyrics: kanaChunks.join(""),
       romaLyrics: wordChunks.map((chunk) => chunk.romaPatterns[0]).join(""),
-      options: mapLine.options,
+      options: rawMapLine.options,
     };
 
     const hasWord = !!kanaChunks.length;
-    if (hasWord && line.lyrics !== "end" && nextLine) {
-      const notes = calcLineNotes(line.wordChunks);
-      wordsData.push({ ...line, kpm: calcLineKpm({ notes, lineDuration }), notes });
+    if (hasWord && builtLine.lyrics !== "end" && nextLine) {
+      const notes = calcLineNotes(builtLine.wordChunks);
+      builtMapLines.push({ ...builtLine, kpm: calcLineKpm({ notes, lineDuration }), notes });
     } else {
-      wordsData.push({ ...line, kpm: { kana: 0, roma: 0 }, notes: { kana: 0, roma: 0 } });
+      builtMapLines.push({ ...builtLine, kpm: { kana: 0, roma: 0 }, notes: { kana: 0, roma: 0 } });
     }
   }
 
-  return wordsData;
+  return builtMapLines;
 };
 
 const calcLineKpm = ({ notes, lineDuration: remainTime }: { notes: BuiltMapLine["notes"]; lineDuration: number }) => {

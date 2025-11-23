@@ -1,11 +1,11 @@
-import type { InputMode, LineWord } from "../type";
+import type { InputMode, TypingWordState } from "../type";
 import { kanaInput, kanaMakeInput } from "./kana-input";
 import { romaInput, romaMakeInput } from "./roma-input";
 import type { TypingEvaluationResult, TypingKey } from "./type";
 
 export const evaluateRomaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: LineWord,
+  lineWord: TypingWordState,
 ): TypingEvaluationResult => {
   const typingKey = romaMakeInput(event);
   const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingKey, lineWord);
@@ -22,7 +22,7 @@ export const evaluateRomaInput = (
 
 export const evaluateKanaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: LineWord,
+  lineWord: TypingWordState,
 ): TypingEvaluationResult => {
   const typingKey = kanaMakeInput(event);
   const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingKey, lineWord);
@@ -40,7 +40,7 @@ export const evaluateKanaInput = (
 export const evaluateTypingInput = (
   typingKeys: TypingKey,
   inputMode: InputMode,
-  lineWord: LineWord,
+  lineWord: TypingWordState,
 ): TypingEvaluationResult => {
   const { newLineWord, successKey, failKey, isUpdatePoint } =
     inputMode === "roma" ? romaInput(typingKeys, lineWord) : kanaInput(typingKeys, lineWord);

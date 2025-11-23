@@ -1,4 +1,4 @@
-import type { Dakuten, HanDakuten, LineWord, NormalizeHirakana } from "../type";
+import type { Dakuten, HanDakuten, NormalizeHirakana, TypingWordState } from "../type";
 import { CODE_TO_KANA, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
 import type { TypingKey } from "./type";
 
@@ -67,9 +67,9 @@ const DAKU_HANDAKU_LIST = [...DAKU_LIST, ...HANDAKU_LIST];
 
 export const kanaInput = (
   typingKeys: TypingKey,
-  lineWord: LineWord,
+  lineWord: TypingWordState,
 ): {
-  newLineWord: LineWord;
+  newLineWord: TypingWordState;
   successKey: string | undefined;
   failKey: string | undefined;
   isUpdatePoint: boolean;
@@ -130,7 +130,7 @@ const parseDakuHandaku = (originalKana: Dakuten | HanDakuten): DakuHandakuData =
   return { type, normalizedKana, originalKana };
 };
 
-const wordUpdate = (typingKey: string, newLineWord: LineWord) => {
+const wordUpdate = (typingKey: string, newLineWord: TypingWordState) => {
   const romaPattern = newLineWord.nextChunk.romaPatterns;
 
   newLineWord.correct.kana += typingKey;

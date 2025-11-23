@@ -1,4 +1,4 @@
-import type { LineWord, WordChunk } from "../type";
+import type { TypingWordState, WordChunk } from "../type";
 import type { TypingKey } from "./type";
 
 export const romaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey">) => {
@@ -29,9 +29,9 @@ const Z_COMMAND_MAP = {
 
 const processedLineWord = (
   typingKeys: TypingKey,
-  lineWord: LineWord,
-): { newLineWord: LineWord; isUpdatePoint: boolean } => {
-  const processNNRouteKey = (lineWord: LineWord) => {
+  lineWord: TypingWordState,
+): { newLineWord: TypingWordState; isUpdatePoint: boolean } => {
+  const processNNRouteKey = (lineWord: TypingWordState) => {
     const newLineWord = { ...lineWord };
     if (!newLineWord.wordChunks[0]) return { newLineWord: lineWord, isUpdatePoint: false };
     newLineWord.correct.kana += "ん";
@@ -40,7 +40,7 @@ const processedLineWord = (
     return { newLineWord, isUpdatePoint: true };
   };
 
-  const zCommand = (lineWord: LineWord) => {
+  const zCommand = (lineWord: TypingWordState) => {
     const newLineWord = { ...lineWord };
     const doublePeriod = newLineWord.nextChunk.kana === "." && newLineWord.wordChunks[0]?.kana === ".";
     const charPoint = newLineWord.nextChunk.point;
@@ -91,9 +91,9 @@ const processedLineWord = (
 
 export const romaInput = (
   typingKeys: TypingKey,
-  lineWord: LineWord,
+  lineWord: TypingWordState,
 ): {
-  newLineWord: LineWord;
+  newLineWord: TypingWordState;
   successKey: string | undefined;
   failKey: string | undefined;
   isUpdatePoint: boolean;
@@ -133,7 +133,7 @@ const updateNextRomaPattern = (eventKey: TypingKey["keys"][number], nextRomaPatt
     .filter((pattern) => pattern !== "");
 };
 
-const kanaFilter = (kana: string, eventKey: TypingKey["keys"][number], newLineWord: LineWord) => {
+const kanaFilter = (kana: string, eventKey: TypingKey["keys"][number], newLineWord: TypingWordState) => {
   const romaPattern = newLineWord.nextChunk.romaPatterns;
   if (kana.length >= 2 && romaPattern[0]) {
     const isSokuon = kana[0] === "っ" && (eventKey === "u" || romaPattern[0][0] === eventKey);
@@ -160,7 +160,7 @@ const nextNNFilter = (eventKey: TypingKey["keys"][number], nextToNextChar: strin
   return nextToNextChar;
 };
 
-const wordUpdate = (eventKey: TypingKey["key"][number], newLineWord: LineWord, _isUpdatePoint: boolean) => {
+const wordUpdate = (eventKey: TypingKey["key"][number], newLineWord: TypingWordState, _isUpdatePoint: boolean) => {
   const kana = newLineWord.nextChunk.kana;
   const romaPattern = newLineWord.nextChunk.romaPatterns;
   let isUpdatePoint = _isUpdatePoint;

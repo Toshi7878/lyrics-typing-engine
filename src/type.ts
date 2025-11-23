@@ -15,7 +15,7 @@ export interface WordChunk {
   kanaUnSupportedSymbol?: string;
 }
 
-export interface LineWord {
+export interface TypingWordState {
   correct: { kana: string; roma: string };
   nextChunk: WordChunk & { orginalDakuChar?: Dakuten | HanDakuten };
   wordChunks: WordChunk[];

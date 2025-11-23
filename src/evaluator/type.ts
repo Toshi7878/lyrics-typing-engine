@@ -1,4 +1,4 @@
-import type { LineWord, WordChunk } from "../type";
+import type { TypingWordState, WordChunk } from "../type";
 
 export interface TypingKey {
   keys: string[];
@@ -8,7 +8,7 @@ export interface TypingKey {
 }
 
 export interface TypingEvaluationResult {
-  newLineWord: LineWord;
+  newLineWord: TypingWordState;
   successKey: string | undefined;
   failKey: string | undefined;
   charType: WordChunk["type"];

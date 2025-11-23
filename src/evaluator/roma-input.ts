@@ -108,9 +108,9 @@ export const romaInput = (
 
   const nextRomaPattern: string[] = newLineWord.nextChunk.romaPatterns;
   const kana = lineWord.nextChunk.kana;
-  const isSuccess = nextRomaPattern.some(
-    (pattern) => (isCaseSensitive ? pattern.charAt(0) : pattern.charAt(0).toLowerCase()) === typingInput.inputChars[0],
-  );
+  const isSuccess = isCaseSensitive
+    ? nextRomaPattern.some((pattern) => pattern.charAt(0) === typingInput.inputChars[0])
+    : nextRomaPattern.some((pattern) => pattern.charAt(0).toLowerCase() === typingInput.inputChars[0]);
 
   if (!isSuccess || !typingInput.inputChars[0]) {
     return {

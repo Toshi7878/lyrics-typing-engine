@@ -124,9 +124,6 @@ import { buildTypingMap, createWordState, evaluateRomaInput, evaluateKanaInput }
 const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 const inputMode = "roma";
 
-// 各行の初期状態を作成
-let currentWordState = createWordState(builtMap[0]);
-
 document.addEventListener('keydown', (event) => {
   if (!isTypingKey(event)) return;
 

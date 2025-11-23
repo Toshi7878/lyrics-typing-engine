@@ -135,7 +135,7 @@ document.addEventListener('keydown', (event) => {
 
   if (typingResult.successKey) {
     // 正解時の処理
-    currentWordState = typingResult.nextWordState;
+    setWordState(typingResult.nextWordState);
   } else if (typingResult.failKey) {
     // ミス時の処理
   }

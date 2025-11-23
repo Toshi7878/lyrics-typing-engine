@@ -59,7 +59,7 @@ const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
  *     wordChunks: [
  *       { kana: "せ", romaPatterns: ["se", "ce"], point: 100, type: "kana" },
  *       { kana: "か", romaPatterns: ["ka", "ca"], point: 100, type: "kana" },
- *       { kana: "い", romaPatterns: ["i"], point: 50, type: "kana" }
+ *       { kana: "い", romaPatterns: ["i", "yi"], point: 50, type: "kana" }
  *     ],
  *     kpm: { kana: 72, roma: 120 },
  *     notes: { kana: 3, roma: 5 },

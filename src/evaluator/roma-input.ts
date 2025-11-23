@@ -1,10 +1,15 @@
 import type { TypingWord, WordChunk } from "../type";
 import type { TypingInput } from "./type";
 
-export const romaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey">): TypingInput => {
+export const romaMakeInput = (
+  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey">,
+  isCaseSensitive: boolean,
+): TypingInput => {
+  const key = isCaseSensitive ? event.key : event.key.toLowerCase();
+
   const input = {
-    inputChars: [event.key.toLowerCase()],
-    key: event.key.toLowerCase(),
+    inputChars: [key],
+    key,
     code: event.code,
     shift: event.shiftKey,
   };
@@ -92,6 +97,7 @@ const processedLineWord = (
 export const romaInput = (
   typingInput: TypingInput,
   lineWord: TypingWord,
+  isCaseSensitive: boolean,
 ): {
   newLineWord: TypingWord;
   successKey: string | undefined;
@@ -102,8 +108,8 @@ export const romaInput = (
 
   const nextRomaPattern: string[] = newLineWord.nextChunk.romaPatterns;
   const kana = lineWord.nextChunk.kana;
-  const isSuccess = nextRomaPattern.some(
-    (pattern) => pattern[0] && pattern[0].toLowerCase() === typingInput.inputChars[0],
+  const isSuccess = nextRomaPattern.some((pattern) =>
+    isCaseSensitive ? pattern.charAt(0) : pattern.charAt(0).toLowerCase() === typingInput.inputChars[0],
   );
 
   if (!isSuccess || !typingInput.inputChars[0]) {

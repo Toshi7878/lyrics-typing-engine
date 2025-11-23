@@ -118,9 +118,11 @@ const timer = () => {
 
 `isTypingKey(event: KeyboardEvent)` - イベント時の文字入力キー判定
 
-`evaluateRomaInput(event: KeyboardEvent, typingWord: TypingWord)` - ローマ字入力時の判定
+`evaluateRomaInput({ event, typingWord, caseSensitive? })` - ローマ字入力時の判定
 
-`evaluateKanaInput(event: KeyboardEvent, typingWord: TypingWord)` - かな入力時の判定
+`evaluateKanaInput({ event, typingWord, caseSensitive? })` - かな入力時の判定
+
+`caseSensitive` - 大文字小文字を区別するかどうか(デフォルトはfalse)
 
 ```typescript
 import { isTypingKey, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
@@ -131,8 +133,10 @@ document.addEventListener('keydown', (event) => {
   if (!isTypingKey(event)) return;
   const typingWord = readTypingWord();
 
-    const typingResult =
-      inputMode === "roma" ? evaluateRomaInput(event, typingWord) : evaluateKanaInput(event, typingWord);
+  const typingResult =
+    inputMode === "roma"
+      ? evaluateRomaInput({ event, typingWord })
+      : evaluateKanaInput({ event, typingWord });
 
   if (typingResult.successKey) {
     // 正解時の処理
@@ -164,7 +168,9 @@ document.addEventListener('keydown', (event) => {
 
 ### リプレイ再生用の入力判定関数
 
-`executeTypingInput(inputChar: string, inputMode: InputMode, typingWord: TypingWord)`
+`executeTypingInput({ inputChar, inputMode, typingWord, caseSensitive? })`
+
+`caseSensitive` - 大文字小文字を区別するかどうか(デフォルトはfalse)
 
 ```typescript
 import { executeTypingInput } from 'lyrics-typing-engine';
@@ -180,7 +186,11 @@ const replayData = [
 
 const typeResults = replayData[0].typeResults;
 const inputMode = replayData[0].startInputMode;
-const typingResult = executeTypingInput(typeResults[0].char, inputMode, typingWord);
+const typingResult = executeTypingInput({
+  inputChar: typeResults[0].char,
+  inputMode,
+  typingWord
+});
 console.log(typingResult);
 
 /**

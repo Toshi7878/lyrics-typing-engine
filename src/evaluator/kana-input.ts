@@ -1,13 +1,17 @@
-import type { Dakuten, HanDakuten, NormalizeHirakana, TypingWord } from "../type";
-import { CODE_TO_KANA, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
+import type { Dakuten, HanDakuten, TypingWord } from "../type";
+import { CODE_TO_KANA, DAKU_HANDAKU_NORMALIZE_MAP, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
 import type { TypingInput } from "./type";
 
-export const kanaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">): TypingInput => {
+export const kanaMakeInput = (
+  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
+  isCaseSensitive: boolean,
+): TypingInput => {
   const codeKanaKey = CODE_TO_KANA.get(event.code);
   const keyToKanaResult = KEY_TO_KANA.get(event.key) ?? [""];
+  const key = isCaseSensitive ? event.key : event.key.toLowerCase();
   const input = {
     inputChars: codeKanaKey ? [...codeKanaKey] : [...keyToKanaResult],
-    key: event.key.toLowerCase(),
+    key,
     code: event.code,
     shift: event.shiftKey,
   };
@@ -45,8 +49,8 @@ export const kanaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shift
 
   if (KEYBOARD_CHARS.includes(event.key)) {
     input.inputChars.push(
-      event.key.toLowerCase(),
-      event.key.toLowerCase().replace(event.key.toLowerCase(), (s) => {
+      key,
+      key.replace(key, (s) => {
         return String.fromCharCode(s.charCodeAt(0) + 0xfee0);
       }),
     );
@@ -55,11 +59,6 @@ export const kanaMakeInput = (event: Pick<KeyboardEvent, "key" | "code" | "shift
   return input;
 };
 
-interface DakuHandakuData {
-  type: "" | "゛" | "゜";
-  normalizedKana: "" | NormalizeHirakana;
-  originalKana: "" | Dakuten | HanDakuten;
-}
 // biome-ignore format: <>
 const DAKU_LIST:Dakuten[] = ["ゔ", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ"];
 const HANDAKU_LIST: HanDakuten[] = ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
@@ -68,6 +67,7 @@ const DAKU_HANDAKU_LIST = [...DAKU_LIST, ...HANDAKU_LIST];
 export const kanaInput = (
   typingInput: TypingInput,
   lineWord: TypingWord,
+  isCaseSensitive: boolean,
 ): {
   newLineWord: TypingWord;
   successKey: string | undefined;
@@ -80,14 +80,11 @@ export const kanaInput = (
   const firstKanaChar = nextKana.charAt(0);
   const { inputChars } = typingInput;
   const isdakuHandaku = DAKU_HANDAKU_LIST.some((char) => char === firstKanaChar);
+  const dakutenInfo = isdakuHandaku ? parseDakuHandaku(firstKanaChar as Dakuten | HanDakuten) : undefined;
 
-  const dakuHanDakuData: DakuHandakuData | undefined = isdakuHandaku
-    ? parseDakuHandaku(firstKanaChar as Dakuten | HanDakuten)
-    : undefined;
-
-  const successIndex: number = firstKanaChar
-    ? inputChars.indexOf(dakuHanDakuData?.normalizedKana ? dakuHanDakuData.normalizedKana : firstKanaChar.toLowerCase())
-    : -1;
+  const successIndex: number = inputChars.indexOf(
+    dakutenInfo?.seionKana ?? (isCaseSensitive ? firstKanaChar : firstKanaChar.toLowerCase()),
+  );
 
   const typingKey =
     inputChars[successIndex] === "゛" || inputChars[successIndex] === "゜"
@@ -104,10 +101,10 @@ export const kanaInput = (
     };
   }
 
-  if (dakuHanDakuData?.type) {
-    const yoon = nextKana.length >= 2 && dakuHanDakuData.type ? nextKana[1] : "";
-    newLineWord.nextChunk.kana = dakuHanDakuData.type + yoon;
-    newLineWord.nextChunk.originalDakutenChar = dakuHanDakuData.originalKana as Dakuten | HanDakuten;
+  if (dakutenInfo?.markType) {
+    const yoon = nextKana.length >= 2 && dakutenInfo.markType ? nextKana[1] : "";
+    newLineWord.nextChunk.kana = dakutenInfo.markType + yoon;
+    newLineWord.nextChunk.originalDakutenChar = dakutenInfo.dakuonKana as Dakuten | HanDakuten;
   } else if (nextKana.length >= 2) {
     newLineWord.correct.kana += typingKey;
     newLineWord.nextChunk.kana = newLineWord.nextChunk.kana.slice(1);
@@ -124,10 +121,12 @@ export const kanaInput = (
   };
 };
 
-const parseDakuHandaku = (originalKana: Dakuten | HanDakuten): DakuHandakuData => {
-  const type: "" | "゛" | "゜" = DAKU_LIST.some((char) => char === originalKana) ? "゛" : "゜";
-  const normalizedKana: "" | NormalizeHirakana = originalKana.normalize("NFD")[0] as NormalizeHirakana;
-  return { type, normalizedKana, originalKana };
+const parseDakuHandaku = (originalKana: Dakuten | HanDakuten) => {
+  return {
+    markType: DAKU_LIST.some((char) => char === originalKana) ? "゛" : "゜",
+    seionKana: DAKU_HANDAKU_NORMALIZE_MAP[originalKana],
+    dakuonKana: originalKana,
+  } as const;
 };
 
 const wordUpdate = (typingKey: string, newLineWord: TypingWord) => {

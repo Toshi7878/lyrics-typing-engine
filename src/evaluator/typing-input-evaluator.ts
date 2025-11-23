@@ -6,14 +6,18 @@ import type { TypingInput, TypingInputResult } from "./type";
 export const evaluateRomaInput = ({
   event,
   typingWord,
-  caseSensitive = false,
+  isCaseSensitive = false,
 }: {
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">;
   typingWord: TypingWord;
-  caseSensitive?: boolean;
+  isCaseSensitive?: boolean;
 }): TypingInputResult => {
-  const typingInput = romaMakeInput(event, caseSensitive);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingInput, { ...typingWord }, caseSensitive);
+  const typingInput = romaMakeInput(event, isCaseSensitive);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(
+    typingInput,
+    { ...typingWord },
+    isCaseSensitive,
+  );
 
   return {
     nextTypingWord: newLineWord,
@@ -28,14 +32,18 @@ export const evaluateRomaInput = ({
 export const evaluateKanaInput = ({
   event,
   typingWord,
-  caseSensitive = false,
+  isCaseSensitive = false,
 }: {
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">;
   typingWord: TypingWord;
-  caseSensitive?: boolean;
+  isCaseSensitive?: boolean;
 }): TypingInputResult => {
-  const typingInput = kanaMakeInput(event, caseSensitive);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingInput, { ...typingWord }, caseSensitive);
+  const typingInput = kanaMakeInput(event, isCaseSensitive);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(
+    typingInput,
+    { ...typingWord },
+    isCaseSensitive,
+  );
 
   return {
     nextTypingWord: newLineWord,
@@ -51,12 +59,12 @@ export const executeTypingInput = ({
   inputChar,
   inputMode,
   typingWord,
-  caseSensitive = false,
+  isCaseSensitive = false,
 }: {
   inputChar: string;
   inputMode: InputMode;
   typingWord: TypingWord;
-  caseSensitive?: boolean;
+  isCaseSensitive?: boolean;
 }): TypingInputResult => {
   const typingInput: TypingInput = {
     inputChars: [inputChar],
@@ -66,8 +74,8 @@ export const executeTypingInput = ({
 
   const { newLineWord, successKey, failKey, isUpdatePoint } =
     inputMode === "roma"
-      ? romaInput(typingInput, { ...typingWord }, caseSensitive)
-      : kanaInput(typingInput, { ...typingWord }, caseSensitive);
+      ? romaInput(typingInput, { ...typingWord }, isCaseSensitive)
+      : kanaInput(typingInput, { ...typingWord }, isCaseSensitive);
 
   return {
     nextTypingWord: newLineWord,

@@ -7,7 +7,7 @@ export interface TypingInput {
   shift?: boolean;
 }
 
-export interface TypingResult {
+export interface TypingInputResult {
   nextTypingWord: TypingWord;
   successKey: string | undefined;
   failKey: string | undefined;

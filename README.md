@@ -300,7 +300,7 @@ interface TypingWord {
 }
 
 // タイピング入力時の判定 型
-interface TypingResult {
+interface TypingInputResult {
   nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー

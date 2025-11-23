@@ -11,7 +11,7 @@ export interface TypingEvaluationResult {
   nextTypingWord: TypingWord;
   successKey: string | undefined;
   failKey: string | undefined;
-  charType: WordChunk["type"];
+  chunkType: WordChunk["type"];
   isCompleted: boolean;
   updatePoint: number;
 }

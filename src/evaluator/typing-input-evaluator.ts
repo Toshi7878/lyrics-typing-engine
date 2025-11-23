@@ -14,7 +14,7 @@ export const evaluateRomaInput = (
     nextTypingWord: newLineWord,
     successKey,
     failKey,
-    charType: typingWord.nextChunk.type,
+    chunkType: typingWord.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
     updatePoint: isUpdatePoint ? typingWord.nextChunk.point : 0,
   };
@@ -31,7 +31,7 @@ export const evaluateKanaInput = (
     nextTypingWord: newLineWord,
     successKey,
     failKey,
-    charType: typingWord.nextChunk.type,
+    chunkType: typingWord.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
     updatePoint: isUpdatePoint ? typingWord.nextChunk.point : 0,
   };
@@ -49,7 +49,7 @@ export const evaluateTypingInput = (
     nextTypingWord: newLineWord,
     successKey,
     failKey,
-    charType: typingWord.nextChunk.type,
+    chunkType: typingWord.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
     updatePoint: isUpdatePoint ? typingWord.nextChunk.point : 0,
   };

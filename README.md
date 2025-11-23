@@ -148,7 +148,7 @@ document.addEventListener('keydown', (event) => {
  *   },
  *   successKey: "o",
  *   failKey: undefined,
- *   charType: "kana",
+ *   chunkType: "kana",
  *   isCompleted: false,
  *   updatePoint: 100
  * }
@@ -244,7 +244,7 @@ interface TypingEvaluationResult {
   nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー
-  charType: WordChunk["type"]; // 入力したタイピングチャンクの種類
+  chunkType: WordChunk["type"]; // 入力したタイピングチャンクの種類
   isCompleted: boolean; // 打ち切り判定
   updatePoint: number; // 加算ポイント
 }

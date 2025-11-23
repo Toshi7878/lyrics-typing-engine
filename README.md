@@ -32,6 +32,7 @@ const rawMapLines: RawMapLine[] = [
 
 const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
 
+console.log(builtMapLines);
 /**
  * [
  *   {
@@ -94,7 +95,7 @@ const timer = () => {
   if (currentTime >= nextLine.time) {
     count++;
     const newTypingWord = createTypingWord(nextLine);
-    setTypingWord(newTypingWord);
+    console.log(newTypingWord);
   }
 
 }
@@ -133,7 +134,6 @@ document.addEventListener('keydown', (event) => {
 
   if (typingResult.successKey) {
     // 正解時の処理
-    setTypingWord(typingResult.nextTypingWord);
   } else if (typingResult.failKey) {
     // ミス時の処理
   }
@@ -149,10 +149,11 @@ document.addEventListener('keydown', (event) => {
 import { parseKanaToWordChunks } from 'lyrics-typing-engine';
 
 const kanaChunks = parseKanaChunks("きゅっとひもをしばる");
+console.log(kanaChunks);
 // ["きゅ", "っと", "ひ", "も", "を", "し", "ば", "る"]
 
 const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint: 50 });
-
+console.log(wordChunks);
 /**
  * [
  *   { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },

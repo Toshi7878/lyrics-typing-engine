@@ -179,7 +179,8 @@ const replayData = [
 ];
 
 const typeResults = replayData[0].typeResults;
-const typingResult = executeTypingInput(typeResults[0].inputChar, "roma", typingWord);
+const inputMode = replayData[0].mode;
+const typingResult = executeTypingInput(typeResults[0].inputChar, inputMode, typingWord);
 console.log(typingResult);
 
 /**

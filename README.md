@@ -174,7 +174,7 @@ const replayData = [
   typeResults: [
     { time: 0, inputChar: "c", isSuccess: true }
     { time: 1, inputChar: "o", isSuccess: true }
-    { time: 2, inputChar: "n", isSuccess: true }
+    { time: 2, inputChar: "a", isSuccess: false }
   ]
 ];
 

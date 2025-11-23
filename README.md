@@ -162,11 +162,9 @@ document.addEventListener('keydown', (event) => {
  */
 ```
 
-### 任意の文字での入力判定
+### リプレイ再生用の入力判定関数
 
 `executeTypingInput(inputChar: string, inputMode: InputMode, typingWord: TypingWord)`
-
-リプレイ再生などに活用できます
 
 ```typescript
 import { executeTypingInput } from 'lyrics-typing-engine';

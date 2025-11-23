@@ -36,8 +36,10 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  * [
  *   {
  *     time: 0,
+ *     duration: 3.5,
  *     lyrics: "こんにちは",
- *     kanaWord: "こんにちは",
+ *     kanaLyrics: "こんにちは",
+ *     romaLyrics: "konnitiha",
  *     wordChunks: [
  *       { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
  *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
@@ -50,8 +52,10 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *   },
  *   {
  *     time: 3.5,
+ *     duration: 2.5,
  *     lyrics: "世界",
- *     kanaWord: "せかい",
+ *     kanaLyrics: "せかい",
+ *     romaLyrics: "sekai",
  *     wordChunks: [
  *       { kana: "せ", romaPatterns: ["se", "ce"], point: 100, type: "kana" },
  *       { kana: "か", romaPatterns: ["ka", "ca"], point: 100, type: "kana" },
@@ -62,8 +66,10 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
  *   },
  *   {
  *     time: 6,
+ *     duration: 0,
  *     lyrics: "end",
- *     kanaWord: "",
+ *     kanaLyrics: "",
+ *     romaLyrics: "",
  *     wordChunks: [],
  *     kpm: { kana: 0, roma: 0 },
  *     notes: { kana: 0, roma: 0 }
@@ -168,11 +174,13 @@ interface MapJsonLine<TOptions = unknown> {
 // ビルド済みタイピング譜面データ型
 interface BuiltMapLine<TOptions = unknown> {
   time: number; // 時間(ミリ秒)
+  duration: number; // 行の時間の長さ(秒) - 次の行のtimeとの差分
   wordChunks: WordChunk[]; // ビルド済みタイピングワード
   lyrics: string; // 歌詞
   kpm: { kana: number; roma: number }; // フレーズの要求速度
   notes: { kana: number; roma: number }; // フレーズの要求打鍵数
-  kanaWord: string; // ひらがなで記述されたタイピングワード
+  kanaLyrics: string; // かな表記の歌詞
+  romaLyrics: string; // ローマ字表記の歌詞(各chunkの最初のパターン)
   options?: TOptions; // オプション(カスタムオプション)
 }
 

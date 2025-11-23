@@ -23,11 +23,13 @@ export interface LineWord {
 
 export interface BuiltMapLine<TOptions = unknown> {
   time: number;
+  duration: number;
   wordChunks: WordChunk[];
   lyrics: string;
   kpm: { kana: number; roma: number };
   notes: { kana: number; roma: number };
-  kanaWord: string;
+  kanaLyrics: string;
+  romaLyrics: string;
   options?: TOptions;
 }
 

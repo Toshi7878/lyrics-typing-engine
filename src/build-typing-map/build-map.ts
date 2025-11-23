@@ -15,32 +15,26 @@ export const buildTypingMap = <TOptions = unknown>({
 
   const kanaChunksLines = parseKanaChunks(mapJson.map((line) => line.word).join("\n"));
   for (const [i, [mapLine, kanaChunks]] of zip(mapJson, kanaChunksLines).entries()) {
+    const wordChunks = parseKanaToWordChunks({ kanaChunks, charPoint });
+    const nextLine = mapJson[i + 1];
+    const lineDuration = nextLine ? Math.floor((Number(nextLine.time) - Number(mapLine.time)) * 1000) / 1000 : 0;
+
     const line = {
       time: Number(mapLine.time),
+      duration: lineDuration,
+      wordChunks,
       lyrics: mapLine.lyrics,
-      kanaWord: kanaChunks.join(""),
-      wordChunks: parseKanaToWordChunks({ kanaChunks, charPoint }),
+      kanaLyrics: kanaChunks.join(""),
+      romaLyrics: wordChunks.map((chunk) => chunk.romaPatterns[0]).join(""),
       options: mapLine.options,
     };
 
     const hasWord = !!kanaChunks.length;
-    const nextLine = mapJson[i + 1];
     if (hasWord && line.lyrics !== "end" && nextLine) {
       const notes = calcLineNotes(line.wordChunks);
-      wordsData.push({
-        kpm: calcLineKpm({
-          notes,
-          lineDuration: Number(nextLine.time) - line.time,
-        }),
-        notes,
-        ...line,
-      });
+      wordsData.push({ ...line, kpm: calcLineKpm({ notes, lineDuration }), notes });
     } else {
-      wordsData.push({
-        kpm: { kana: 0, roma: 0 },
-        notes: { kana: 0, roma: 0 },
-        ...line,
-      });
+      wordsData.push({ ...line, kpm: { kana: 0, roma: 0 }, notes: { kana: 0, roma: 0 } });
     }
   }
 

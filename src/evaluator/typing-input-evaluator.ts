@@ -5,53 +5,53 @@ import type { TypingEvaluationResult, TypingKey } from "./type";
 
 export const evaluateRomaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: TypingWordState,
+  wordState: TypingWordState,
 ): TypingEvaluationResult => {
   const typingKey = romaMakeInput(event);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingKey, lineWord);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingKey, { ...wordState });
 
   return {
-    newLineWord,
+    nextWordState: newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChunk.type,
+    charType: wordState.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
+    updatePoint: isUpdatePoint ? wordState.nextChunk.point : 0,
   };
 };
 
 export const evaluateKanaInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
-  lineWord: TypingWordState,
+  wordState: TypingWordState,
 ): TypingEvaluationResult => {
   const typingKey = kanaMakeInput(event);
-  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingKey, lineWord);
+  const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(typingKey, { ...wordState });
 
   return {
-    newLineWord,
+    nextWordState: newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChunk.type,
+    charType: wordState.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
+    updatePoint: isUpdatePoint ? wordState.nextChunk.point : 0,
   };
 };
 
 export const evaluateTypingInput = (
   typingKeys: TypingKey,
   inputMode: InputMode,
-  lineWord: TypingWordState,
+  wordState: TypingWordState,
 ): TypingEvaluationResult => {
   const { newLineWord, successKey, failKey, isUpdatePoint } =
-    inputMode === "roma" ? romaInput(typingKeys, lineWord) : kanaInput(typingKeys, lineWord);
+    inputMode === "roma" ? romaInput(typingKeys, { ...wordState }) : kanaInput(typingKeys, { ...wordState });
 
   return {
-    newLineWord,
+    nextWordState: newLineWord,
     successKey,
     failKey,
-    charType: lineWord.nextChunk.type,
+    charType: wordState.nextChunk.type,
     isCompleted: newLineWord.nextChunk.kana === "",
-    updatePoint: isUpdatePoint ? lineWord.nextChunk.point : 0,
+    updatePoint: isUpdatePoint ? wordState.nextChunk.point : 0,
   };
 };
 

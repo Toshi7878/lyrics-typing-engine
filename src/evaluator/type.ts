@@ -8,7 +8,7 @@ export interface TypingKey {
 }
 
 export interface TypingEvaluationResult {
-  newLineWord: TypingWordState;
+  nextWordState: TypingWordState;
   successKey: string | undefined;
   failKey: string | undefined;
   charType: WordChunk["type"];

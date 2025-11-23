@@ -98,9 +98,7 @@ export const romaInput = (
   failKey: string | undefined;
   isUpdatePoint: boolean;
 } => {
-  let { newLineWord, isUpdatePoint } = processedLineWord(typingKeys, {
-    ...lineWord,
-  });
+  let { newLineWord, isUpdatePoint } = processedLineWord(typingKeys, lineWord);
 
   const nextRomaPattern: string[] = newLineWord.nextChunk.romaPatterns;
   const kana = lineWord.nextChunk.kana;

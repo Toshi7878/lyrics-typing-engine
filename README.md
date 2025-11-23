@@ -82,11 +82,11 @@ const builtMap = buildTypingMap({ mapJson, charPoint: 50 });
 
 `isTypingKey(event: KeyboardEvent)` - イベント時の文字入力キー判定
 
-`evaluateRomaInput(event: KeyboardEvent, lineWord: TypingWordState)` - ローマ字入力時の判定
+`evaluateRomaInput(event: KeyboardEvent, wordState: TypingWordState)` - ローマ字入力時の判定
 
-`evaluateKanaInput(event: KeyboardEvent, lineWord: TypingWordState)` - かな入力時の判定
+`evaluateKanaInput(event: KeyboardEvent, wordState: TypingWordState)` - かな入力時の判定
 
-`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, lineWord: TypingWordState)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
+`evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, wordState: TypingWordState)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
 
 ```typescript
 import { evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
@@ -97,11 +97,11 @@ document.addEventListener('keydown', (event) => {
   if (!isTypingKey(event)) return;
 
     const typingResult =
-      inputMode === "roma" ? evaluateRomaInput(event, lineWord) : evaluateKanaInput(event, lineWord);
+      inputMode === "roma" ? evaluateRomaInput(event, wordState) : evaluateKanaInput(event, wordState);
 
   if (typingResult.successKey) {
     // 正解時の処理
-    currentLineWord = typingResult.newLineWord;
+    currentWordState = typingResult.nextWordState;
   } else if (typingResult.failKey) {
     // ミス時の処理
   }
@@ -194,7 +194,7 @@ interface WordChunk {
 
 // タイピング入力時の判定 型
 interface TypingEvaluationResult {
-  newLineWord: TypingWordState; // 更新後のタイピングワード
+  nextWordState: TypingWordState; // 更新後のタイピングワード (ミス時は実質更新されません)
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー
   charType: WordChunk["type"]; // 入力したタイピングチャンクの種類

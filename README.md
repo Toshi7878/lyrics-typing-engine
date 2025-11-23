@@ -164,9 +164,9 @@ document.addEventListener('keydown', (event) => {
  */
 ```
 
-### 文字列からwordChunksの生成 (タイピング中の入力モード切り替え機能などで使用)
+### 文字列からタイピングワードの生成 (タイピング中の入力モード切り替え機能などで使用)
 
-`parseWordToChunks(word: string, charPoint: number)` - 文字列からwordChunksを生成
+`parseWordToChunks(word: string, charPoint: number)` - 文字列からタイピングワードを生成
 ```typescript
 import { parseWordToChunks } from 'lyrics-typing-engine';
 

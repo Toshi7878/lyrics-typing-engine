@@ -170,7 +170,7 @@ document.addEventListener('keydown', (event) => {
 import { executeTypingInput } from 'lyrics-typing-engine';
 
 const replayData = [
-  mode: "roma",
+  startInputMode: "roma",
   typeResults: [
     { time: 0, inputChar: "c", }
     { time: 1, inputChar: "o", }
@@ -179,7 +179,7 @@ const replayData = [
 ];
 
 const typeResults = replayData[0].typeResults;
-const inputMode = replayData[0].mode;
+const inputMode = replayData[0].startInputMode;
 const typingResult = executeTypingInput(typeResults[0].inputChar, inputMode, typingWord);
 console.log(typingResult);
 

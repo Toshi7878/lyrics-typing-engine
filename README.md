@@ -120,9 +120,8 @@ const timer = () => {
 `evaluateTypingInput(typingKeys: TypingKey, inputMode: InputMode, typingWord: TypingWord)` - どこでも呼び出し可能な入力判定関数 (リプレイなどで使用可能)
 
 ```typescript
-import { buildTypingMap, createTypingWord, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
+import { isTypingKey, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
 
-const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
 const inputMode = "roma";
 
 document.addEventListener('keydown', (event) => {
@@ -134,10 +133,26 @@ document.addEventListener('keydown', (event) => {
 
   if (typingResult.successKey) {
     // 正解時の処理
+    console.log(typingResult);
   } else if (typingResult.failKey) {
     // ミス時の処理
   }
 });
+
+/**
+ * {
+ *   nextTypingWord: {
+ *     correct: { kana: "こ", roma: "co" },
+ *     nextChunk: { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
+ *     wordChunks: [{ kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" }, { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" }, { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" } ]
+ *   },
+ *   successKey: "o",
+ *   failKey: undefined,
+ *   charType: "kana",
+ *   isCompleted: false,
+ *   updatePoint: 100
+ * }
+ */
 ```
 
 ### 文字列からwordChunksの生成 (タイピング中の入力モード切り替え機能などで使用)

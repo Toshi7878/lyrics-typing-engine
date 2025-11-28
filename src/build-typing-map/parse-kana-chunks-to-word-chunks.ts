@@ -1,6 +1,7 @@
 import type { WordChunk } from "../type";
+import { isAlphabet } from "../utils/is-alphabet";
 import { convertZenkakuToHankaku } from "../utils/zenkaku-to-hankaku";
-import { ALPHABET_LIST, NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
+import { NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
 
 // biome-ignore format:<>
 const NN_LIST = ["あ", "い", "う", "え", "お", "な", "に", "ぬ", "ね", "の", "や", "ゆ", "よ", "ん", "'", "’", "a", "i", "u", "e", "o", "y", "n", "A", "I", "U", "E", "O", "Y", "N"];
@@ -189,7 +190,7 @@ const determineCharacterType = ({ kanaChar, romaChar }: { kanaChar: string; roma
     return "kana";
   }
 
-  if (ALPHABET_LIST.includes(romaChar)) {
+  if (isAlphabet(romaChar)) {
     return "alphabet";
   }
 

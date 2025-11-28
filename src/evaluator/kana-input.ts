@@ -12,7 +12,7 @@ export const kanaMakeInput = (
   const keyToKanaResult = KEY_TO_KANA.get(event.key) ?? [""];
 
   let key: string;
-  if (isCaseSensitive && isAlphabet(nextChunk.kana)) {
+  if (isCaseSensitive && nextChunk.type === "alphabet") {
     const isCapsLock = event.getModifierState("CapsLock") ?? false;
     if (isCapsLock && isAlphabet(event.key)) {
       key = event.key === event.key.toUpperCase() ? event.key.toLowerCase() : event.key.toUpperCase();

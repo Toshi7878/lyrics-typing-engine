@@ -3,12 +3,25 @@ import { CODE_TO_KANA, DAKU_HANDAKU_NORMALIZE_MAP, KEY_TO_KANA, KEYBOARD_CHARS }
 import type { TypingInput } from "./type";
 
 export const kanaMakeInput = (
-  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">,
+  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode" | "getModifierState">,
   isCaseSensitive: boolean,
 ): TypingInput => {
   const codeKanaKey = CODE_TO_KANA.get(event.code);
   const keyToKanaResult = KEY_TO_KANA.get(event.key) ?? [""];
-  const key = isCaseSensitive ? event.key : event.key.toLowerCase();
+
+  const isCapsLock = event.getModifierState("CapsLock") ?? false;
+
+  let key: string;
+  if (isCaseSensitive) {
+    if (isCapsLock && /^[a-zA-Z]$/.test(event.key)) {
+      key = event.key === event.key.toUpperCase() ? event.key.toLowerCase() : event.key.toUpperCase();
+    } else {
+      key = event.key;
+    }
+  } else {
+    key = event.key.toLowerCase();
+  }
+
   const input = {
     inputChars: codeKanaKey ? [...codeKanaKey] : [...keyToKanaResult],
     key,

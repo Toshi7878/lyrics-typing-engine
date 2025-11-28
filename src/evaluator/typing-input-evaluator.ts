@@ -8,7 +8,7 @@ export const evaluateRomaInput = ({
   typingWord,
   isCaseSensitive = false,
 }: {
-  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">;
+  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "getModifierState">;
   typingWord: TypingWord;
   isCaseSensitive?: boolean;
 }): TypingInputResult => {
@@ -34,7 +34,7 @@ export const evaluateKanaInput = ({
   typingWord,
   isCaseSensitive = false,
 }: {
-  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode">;
+  event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode" | "getModifierState">;
   typingWord: TypingWord;
   isCaseSensitive?: boolean;
 }): TypingInputResult => {

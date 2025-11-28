@@ -1,15 +1,16 @@
 import type { TypingWord, WordChunk } from "../type";
+import { isAlphabet } from "../utils/is-alphabet";
 import type { TypingInput } from "./type";
 
 export const romaMakeInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "getModifierState">,
   isCaseSensitive: boolean,
+  nextChunk: WordChunk,
 ): TypingInput => {
-  const isCapsLock = event.getModifierState("CapsLock") ?? false;
-
   let key: string;
-  if (isCaseSensitive) {
-    if (isCapsLock && /^[a-zA-Z]$/.test(event.key)) {
+  if (isCaseSensitive && isAlphabet(nextChunk.kana)) {
+    const isCapsLock = event.getModifierState("CapsLock") ?? false;
+    if (isCapsLock && isAlphabet(event.key)) {
       key = event.key === event.key.toUpperCase() ? event.key.toLowerCase() : event.key.toUpperCase();
     } else {
       key = event.key;

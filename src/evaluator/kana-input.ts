@@ -1,19 +1,20 @@
-import type { Dakuten, HanDakuten, TypingWord } from "../type";
+import type { Dakuten, HanDakuten, TypingWord, WordChunk } from "../type";
+import { isAlphabet } from "../utils/is-alphabet";
 import { CODE_TO_KANA, DAKU_HANDAKU_NORMALIZE_MAP, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
 import type { TypingInput } from "./type";
 
 export const kanaMakeInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode" | "getModifierState">,
   isCaseSensitive: boolean,
+  nextChunk: WordChunk,
 ): TypingInput => {
   const codeKanaKey = CODE_TO_KANA.get(event.code);
   const keyToKanaResult = KEY_TO_KANA.get(event.key) ?? [""];
 
-  const isCapsLock = event.getModifierState("CapsLock") ?? false;
-
   let key: string;
-  if (isCaseSensitive) {
-    if (isCapsLock && /^[a-zA-Z]$/.test(event.key)) {
+  if (isCaseSensitive && isAlphabet(nextChunk.kana)) {
+    const isCapsLock = event.getModifierState("CapsLock") ?? false;
+    if (isCapsLock && isAlphabet(event.key)) {
       key = event.key === event.key.toUpperCase() ? event.key.toLowerCase() : event.key.toUpperCase();
     } else {
       key = event.key;

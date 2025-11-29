@@ -65,13 +65,15 @@ const processedLineWord = (
       const triplePeriod = doublePeriod && newLineWord.wordChunks[1]?.kana === ".";
       if (triplePeriod) {
         newLineWord.nextChunk = {
-          ...structuredClone(Z_COMMAND_MAP["..."]),
+          ...Z_COMMAND_MAP["..."],
+          romaPatterns: [...Z_COMMAND_MAP["..."].romaPatterns],
           point: charPoint * 3,
         };
         newLineWord.wordChunks.splice(0, 2);
       } else {
         newLineWord.nextChunk = {
-          ...structuredClone(Z_COMMAND_MAP[".."]),
+          ...Z_COMMAND_MAP[".."],
+          romaPatterns: [...Z_COMMAND_MAP[".."].romaPatterns],
           point: charPoint * 2,
         };
         newLineWord.wordChunks.splice(0, 1);
@@ -149,9 +151,16 @@ export const romaInput = (
 };
 
 const updateNextRomaPattern = (eventKey: TypingInput["inputChars"][number], nextRomaPattern: string[]) => {
-  return nextRomaPattern
-    .map((pattern) => (pattern.startsWith(eventKey) ? pattern.slice(1) : ""))
-    .filter((pattern) => pattern !== "");
+  const result: string[] = [];
+  for (const pattern of nextRomaPattern) {
+    if (pattern.startsWith(eventKey)) {
+      const sliced = pattern.slice(1);
+      if (sliced !== "") {
+        result.push(sliced);
+      }
+    }
+  }
+  return result;
 };
 
 const kanaFilter = (kana: string, eventKey: TypingInput["inputChars"][number], newLineWord: TypingWord) => {
@@ -174,7 +183,7 @@ const nextNNFilter = (eventKey: TypingInput["inputChars"][number], nextToNextCha
 
   if (isXN) {
     return nextToNextChar.filter((value: string) => {
-      return value.match(/^(?!(n|')).*$/);
+      return !value.startsWith("n") && !value.startsWith("'");
     });
   }
 

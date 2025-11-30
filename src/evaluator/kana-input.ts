@@ -64,9 +64,7 @@ export const kanaMakeInput = (
   if (KEYBOARD_CHARS.includes(event.key)) {
     input.inputChars.push(
       key,
-      key.replace(key, (s) => {
-        return String.fromCharCode(s.charCodeAt(0) + 0xfee0);
-      }),
+      key.replace(key, (s) =>  String.fromCharCode(s.charCodeAt(0) + 0xfee0)),
     );
   }
 
@@ -88,7 +86,7 @@ export const kanaInput = (
   failKey: string | undefined;
   isUpdatePoint: boolean;
 } => {
-  const newLineWord = { ...lineWord };
+  const newLineWord = lineWord;
 
   const nextKana = lineWord.nextChunk.kana;
   const firstKanaChar = nextKana.charAt(0);

@@ -49,7 +49,8 @@ const processedLineWord = (
   lineWord: TypingWord,
 ): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
   const processNNRouteKey = (lineWord: TypingWord) => {
-    const newLineWord = { ...lineWord };
+    const newLineWord = lineWord;
+
     if (!newLineWord.wordChunks[0]) return { newLineWord: lineWord, isUpdatePoint: false };
     newLineWord.correct.kana += "ん";
     newLineWord.nextChunk = newLineWord.wordChunks[0];
@@ -58,7 +59,8 @@ const processedLineWord = (
   };
 
   const zCommand = (lineWord: TypingWord) => {
-    const newLineWord = { ...lineWord };
+    const newLineWord = lineWord;
+
     const doublePeriod = newLineWord.nextChunk.kana === "." && newLineWord.wordChunks[0]?.kana === ".";
     const charPoint = newLineWord.nextChunk.point;
     if (doublePeriod) {

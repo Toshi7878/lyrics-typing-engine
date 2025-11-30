@@ -11,6 +11,7 @@ jobs:
     permissions:
       contents: read
       id-token: write
+
     steps:
       - uses: actions/checkout@v4
 
@@ -25,8 +26,13 @@ jobs:
       - name: Build
         run: npm run build
 
-      - name: Publish to npm
-        run: npm publish --provenance --access public
+      - name: Publish to npm with retry
         env:
           NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
-
+        run: |
+          for i in 1 2 3 4 5; do
+            echo "Attempt $i: Publishing…"
+            npm publish --provenance --access public && break
+            echo "Publish failed. Retrying in 5 seconds..."
+            sleep 5
+          done

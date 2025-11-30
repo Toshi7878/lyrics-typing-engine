@@ -5,25 +5,36 @@ on:
     tags:
       - 'v*'
 
-permissions:
-  id-token: write  # Required for OIDC
-  contents: read
+concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 jobs:
-  publish:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
+    release:
+        runs-on: ubuntu-latest
 
-      - uses: actions/setup-node@v4
-        with:
-          node-version: '20'
-          registry-url: 'https://registry.npmjs.org'
+        permissions:
+            contents: write
+            id-token: write  # この設定を忘れずに
+            pull-requests: write
 
-      # Ensure npm 11.5.1 or later is installed
-      - name: Update npm
-        run: npm install -g npm@latest
-      - run: npm ci
-      - run: npm run build --if-present
-      - run: npm test
-      - run: npm publish
+        strategy:
+            matrix:
+                node-version: [24.x]
+
+        steps:
+            - uses: actions/checkout@v5
+
+            - name: Use Node.js ${{ matrix.node-version }}
+              uses: actions/setup-node@v4
+              with:
+                  node-version: ${{ matrix.node-version }}
+
+            - run: npm ci
+
+            - name: Create Release Pull Request or Publish to npm
+              id: changesets
+              uses: changesets/action@v1
+              with:
+                  version: npm run ci:version
+                  publish: npm run ci:publish
+              env:
+                  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

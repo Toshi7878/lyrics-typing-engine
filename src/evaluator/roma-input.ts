@@ -49,26 +49,16 @@ const processedLineWord = (
   lineWord: TypingWord,
 ): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
   const processNNRouteKey = (lineWord: TypingWord) => {
-    if (!lineWord.wordChunks[0]) return { newLineWord: lineWord, isUpdatePoint: false };
-
-    const newLineWord = {
-      ...lineWord,
-      correct: { ...lineWord.correct },
-      wordChunks: lineWord.wordChunks.slice(1),
-      nextChunk: { ...lineWord.wordChunks[0] },
-    };
+    const newLineWord = { ...lineWord };
+    if (!newLineWord.wordChunks[0]) return { newLineWord: lineWord, isUpdatePoint: false };
     newLineWord.correct.kana += "ん";
+    newLineWord.nextChunk = newLineWord.wordChunks[0];
+    newLineWord.wordChunks.splice(0, 1);
     return { newLineWord, isUpdatePoint: true };
   };
 
   const zCommand = (lineWord: TypingWord) => {
-    const newLineWord = {
-      ...lineWord,
-      correct: { ...lineWord.correct },
-      wordChunks: [...lineWord.wordChunks],
-      nextChunk: { ...lineWord.nextChunk },
-    };
-
+    const newLineWord = { ...lineWord };
     const doublePeriod = newLineWord.nextChunk.kana === "." && newLineWord.wordChunks[0]?.kana === ".";
     const charPoint = newLineWord.nextChunk.point;
     if (doublePeriod) {
@@ -79,14 +69,14 @@ const processedLineWord = (
           romaPatterns: [...Z_COMMAND_MAP["..."].romaPatterns],
           point: charPoint * 3,
         };
-        newLineWord.wordChunks = newLineWord.wordChunks.slice(2);
+        newLineWord.wordChunks.splice(0, 2);
       } else {
         newLineWord.nextChunk = {
           ...Z_COMMAND_MAP[".."],
           romaPatterns: [...Z_COMMAND_MAP[".."].romaPatterns],
           point: charPoint * 2,
         };
-        newLineWord.wordChunks = newLineWord.wordChunks.slice(1);
+        newLineWord.wordChunks.splice(0, 1);
       }
     }
     return { newLineWord, isUpdatePoint: false };
@@ -108,30 +98,14 @@ const processedLineWord = (
       return processNNRouteKey(lineWord);
     }
 
-    return {
-      newLineWord: {
-        ...lineWord,
-        correct: { ...lineWord.correct },
-        wordChunks: [...lineWord.wordChunks],
-        nextChunk: { ...lineWord.nextChunk },
-      },
-      isUpdatePoint: false,
-    };
+    return { newLineWord: lineWord, isUpdatePoint: false };
   }
 
   if (typingInput.code === "KeyZ" && !typingInput.shift) {
     return zCommand(lineWord);
   }
 
-  return {
-    newLineWord: {
-      ...lineWord,
-      correct: { ...lineWord.correct },
-      wordChunks: [...lineWord.wordChunks],
-      nextChunk: { ...lineWord.nextChunk },
-    },
-    isUpdatePoint: false,
-  };
+  return { newLineWord: lineWord, isUpdatePoint: false };
 };
 
 export const romaInput = (
@@ -162,7 +136,6 @@ export const romaInput = (
   }
 
   if (kana === "ん" && newLineWord.wordChunks[0]) {
-    newLineWord.wordChunks[0] = { ...newLineWord.wordChunks[0] };
     newLineWord.wordChunks[0].romaPatterns = nextNNFilter(
       typingInput.inputChars[0],
       newLineWord.wordChunks[0].romaPatterns,
@@ -225,15 +198,12 @@ const wordUpdate = (eventKey: TypingInput["key"][number], newLineWord: TypingWor
   if (!romaPattern.length) {
     newLineWord.correct.kana += kana;
     isUpdatePoint = true;
-    const nextChunk = newLineWord.wordChunks.shift();
-    newLineWord.nextChunk = nextChunk
-      ? { ...nextChunk }
-      : {
-          kana: "",
-          romaPatterns: [""],
-          point: 0,
-          type: undefined,
-        };
+    newLineWord.nextChunk = newLineWord.wordChunks.shift() || {
+      kana: "",
+      romaPatterns: [""],
+      point: 0,
+      type: undefined,
+    };
   }
 
   newLineWord.correct.roma += eventKey;

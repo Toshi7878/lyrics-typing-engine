@@ -88,12 +88,7 @@ export const kanaInput = (
   failKey: string | undefined;
   isUpdatePoint: boolean;
 } => {
-  const newLineWord = {
-    ...lineWord,
-    correct: { ...lineWord.correct },
-    wordChunks: [...lineWord.wordChunks],
-    nextChunk: { ...lineWord.nextChunk },
-  };
+  const newLineWord = { ...lineWord };
 
   const nextKana = lineWord.nextChunk.kana;
   const firstKanaChar = nextKana.charAt(0);
@@ -154,14 +149,11 @@ const wordUpdate = (typingKey: string, newLineWord: TypingWord) => {
   newLineWord.correct.kana += typingKey;
   newLineWord.correct.roma += romaPattern[0];
 
-  const nextChunk = newLineWord.wordChunks.shift();
-  newLineWord.nextChunk = nextChunk
-    ? { ...nextChunk }
-    : {
-        kana: "",
-        romaPatterns: [""],
-        point: 0,
-        type: undefined,
-      };
+  newLineWord.nextChunk = newLineWord.wordChunks.shift() || {
+    kana: "",
+    romaPatterns: [""],
+    point: 0,
+    type: undefined,
+  };
   return { newLineWord, isUpdatePoint: true };
 };

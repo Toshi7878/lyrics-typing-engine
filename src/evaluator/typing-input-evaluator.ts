@@ -3,20 +3,6 @@ import { kanaInput, kanaMakeInput } from "./kana-input";
 import { romaInput, romaMakeInput } from "./roma-input";
 import type { TypingInput, TypingInputResult } from "./type";
 
-const cloneTypingWord = (typingWord: TypingWord): TypingWord => {
-  return {
-    correct: { ...typingWord.correct },
-    nextChunk: {
-      ...typingWord.nextChunk,
-      romaPatterns: [...typingWord.nextChunk.romaPatterns],
-    },
-    wordChunks: typingWord.wordChunks.map((chunk) => ({
-      ...chunk,
-      romaPatterns: [...chunk.romaPatterns],
-    })),
-  };
-};
-
 export const evaluateRomaInput = ({
   event,
   typingWord,
@@ -28,10 +14,9 @@ export const evaluateRomaInput = ({
 }): TypingInputResult => {
   const typingInput = romaMakeInput(event, isCaseSensitive, typingWord.nextChunk);
 
-  // cloneTypingWordで新しいオブジェクトを生成してから渡す
   const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(
     typingInput,
-    cloneTypingWord(typingWord),
+    { ...typingWord },
     isCaseSensitive,
   );
 
@@ -58,7 +43,7 @@ export const evaluateKanaInput = ({
 
   const { newLineWord, successKey, failKey, isUpdatePoint } = kanaInput(
     typingInput,
-    cloneTypingWord(typingWord),
+    { ...typingWord },
     isCaseSensitive,
   );
 
@@ -91,8 +76,8 @@ export const executeTypingInput = ({
 
   const { newLineWord, successKey, failKey, isUpdatePoint } =
     inputMode === "roma"
-      ? romaInput(typingInput, cloneTypingWord(typingWord), isCaseSensitive)
-      : kanaInput(typingInput, cloneTypingWord(typingWord), isCaseSensitive);
+      ? romaInput(typingInput, { ...typingWord }, isCaseSensitive)
+      : kanaInput(typingInput, { ...typingWord }, isCaseSensitive);
 
   return {
     nextTypingWord: newLineWord,

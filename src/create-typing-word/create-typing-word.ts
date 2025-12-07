@@ -2,10 +2,11 @@ import type { BuiltMapLine, TypingWord } from "../type";
 
 export const createTypingWord = <TOptions = unknown>(
   builtMapLine: Pick<BuiltMapLine<TOptions>, "wordChunks">,
+  correct?: TypingWord["correct"],
 ): TypingWord => {
   if (!builtMapLine.wordChunks[0]) {
     return {
-      correct: { kana: "", roma: "" },
+      correct: correct ? { ...correct } : { kana: "", roma: "" },
       nextChunk: {
         kana: "",
         romaPatterns: [],
@@ -17,7 +18,7 @@ export const createTypingWord = <TOptions = unknown>(
   }
 
   return {
-    correct: { kana: "", roma: "" },
+    correct: correct ? { ...correct } : { kana: "", roma: "" },
     nextChunk: { ...builtMapLine.wordChunks[0], romaPatterns: [...builtMapLine.wordChunks[0].romaPatterns] },
     wordChunks: builtMapLine.wordChunks.slice(1).map((chunk) => ({
       ...chunk,

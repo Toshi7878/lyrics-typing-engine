@@ -14,11 +14,7 @@ export const evaluateRomaInput = ({
 }): TypingInputResult => {
   const typingInput = romaMakeInput(event, isCaseSensitive, typingWord.nextChunk);
 
-  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(
-    typingInput,
-    { ...typingWord },
-    isCaseSensitive,
-  );
+  const { newLineWord, successKey, failKey, isUpdatePoint } = romaInput(typingInput, typingWord, isCaseSensitive);
 
   return {
     nextTypingWord: newLineWord,
@@ -76,7 +72,7 @@ export const executeTypingInput = ({
 
   const { newLineWord, successKey, failKey, isUpdatePoint } =
     inputMode === "roma"
-      ? romaInput(typingInput, { ...typingWord }, isCaseSensitive)
+      ? romaInput(typingInput, typingWord, isCaseSensitive)
       : kanaInput(typingInput, { ...typingWord }, isCaseSensitive);
 
   return {

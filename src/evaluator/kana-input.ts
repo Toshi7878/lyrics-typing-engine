@@ -13,7 +13,7 @@ export const kanaMakeInput = (
 
   let key: string;
   if (isCaseSensitive && nextChunk.type === "alphabet") {
-    const isCapsLock = event.getModifierState("CapsLock") ?? false;
+    const isCapsLock = event.getModifierState?.("CapsLock") ?? false;
     if (isCapsLock && isAlphabet(event.key)) {
       key = event.key === event.key.toUpperCase() ? event.key.toLowerCase() : event.key.toUpperCase();
     } else {
@@ -23,7 +23,7 @@ export const kanaMakeInput = (
     key = event.key.toLowerCase();
   }
 
-  const input = {
+  const input: TypingInput = {
     inputChars: codeKanaKey ? [...codeKanaKey] : [...keyToKanaResult],
     key,
     code: event.code,
@@ -35,28 +35,22 @@ export const kanaMakeInput = (
   } else if (event.shiftKey) {
     if (event.code === "KeyE") {
       input.inputChars[0] = "ぃ";
-    }
-    if (event.code === "KeyZ") {
+    } else if (event.code === "KeyZ") {
       input.inputChars[0] = "っ";
     }
 
     //ATOK入力 https://support.justsystems.com/faq/1032/app/servlet/qadoc?QID=024273
-    if (event.code === "KeyV") {
+    else if (event.code === "KeyV") {
       input.inputChars.push("ゐ", "ヰ");
-    }
-    if (event.code === "Equal") {
+    } else if (event.code === "Equal") {
       input.inputChars.push("ゑ", "ヱ");
-    }
-    if (event.code === "KeyT") {
+    } else if (event.code === "KeyT") {
       input.inputChars.push("ヵ");
-    }
-    if (event.code === "Quote") {
+    } else if (event.code === "Quote") {
       input.inputChars.push("ヶ");
-    }
-    if (event.code === "KeyF") {
+    } else if (event.code === "KeyF") {
       input.inputChars.push("ゎ");
-    }
-    if (event.code === "Digit0") {
+    } else if (event.code === "Digit0") {
       input.inputChars = ["を"];
     }
   }
@@ -64,17 +58,38 @@ export const kanaMakeInput = (
   if (KEYBOARD_CHARS.includes(event.key)) {
     input.inputChars.push(
       key,
-      key.replace(key, (s) =>  String.fromCharCode(s.charCodeAt(0) + 0xfee0)),
+      key.replace(key, (s) => String.fromCharCode(s.charCodeAt(0) + 0xfee0)),
     );
   }
 
   return input;
 };
 
-// biome-ignore format: <>
-const DAKU_LIST:Dakuten[] = ["ゔ", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ"];
-const HANDAKU_LIST: HanDakuten[] = ["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
-const DAKU_HANDAKU_LIST = [...DAKU_LIST, ...HANDAKU_LIST];
+// Setを使用して検索をO(1)にする
+const DAKU_SET = new Set([
+  "ゔ",
+  "が",
+  "ぎ",
+  "ぐ",
+  "げ",
+  "ご",
+  "ざ",
+  "じ",
+  "ず",
+  "ぜ",
+  "ぞ",
+  "だ",
+  "ぢ",
+  "づ",
+  "で",
+  "ど",
+  "ば",
+  "び",
+  "ぶ",
+  "べ",
+  "ぼ",
+]);
+const HANDAKU_SET = new Set(["ぱ", "ぴ", "ぷ", "ぺ", "ぽ"]);
 
 export const kanaInput = (
   typingInput: TypingInput,
@@ -86,17 +101,44 @@ export const kanaInput = (
   failKey: string | undefined;
   isUpdatePoint: boolean;
 } => {
-  const newLineWord = lineWord;
+  // 副作用を防ぐためにオブジェクトをコピーする
+  const workingWord: TypingWord = {
+    correct: { ...lineWord.correct },
+    nextChunk: { ...lineWord.nextChunk },
+    wordChunks: [...lineWord.wordChunks],
+  };
+  const newLineWord = workingWord;
 
-  const nextKana = lineWord.nextChunk.kana;
+  const nextKana = newLineWord.nextChunk.kana;
   const firstKanaChar = nextKana.charAt(0);
   const { inputChars } = typingInput;
-  const isdakuHandaku = DAKU_HANDAKU_LIST.some((char) => char === firstKanaChar);
-  const dakutenInfo = isdakuHandaku ? parseDakuHandaku(firstKanaChar as Dakuten | HanDakuten) : undefined;
 
-  const successIndex: number = inputChars.indexOf(
-    dakutenInfo?.seionKana ?? (isCaseSensitive ? firstKanaChar : firstKanaChar.toLowerCase()),
-  );
+  // Setを使った高速な判定
+  const isDaku = DAKU_SET.has(firstKanaChar);
+  const isHandaku = !isDaku && HANDAKU_SET.has(firstKanaChar);
+
+  let dakutenInfo: { markType: string; seionKana: string; dakuonKana: string } | undefined;
+
+  if (isDaku) {
+    dakutenInfo = {
+      markType: "゛",
+      seionKana: DAKU_HANDAKU_NORMALIZE_MAP[firstKanaChar as Dakuten] || firstKanaChar,
+      dakuonKana: firstKanaChar,
+    };
+  } else if (isHandaku) {
+    dakutenInfo = {
+      markType: "゜",
+      seionKana: DAKU_HANDAKU_NORMALIZE_MAP[firstKanaChar as HanDakuten] || firstKanaChar,
+      dakuonKana: firstKanaChar,
+    };
+  }
+
+  const targetChar = dakutenInfo
+    ? dakutenInfo.seionKana
+    : isCaseSensitive
+      ? firstKanaChar
+      : firstKanaChar.toLowerCase();
+  const successIndex: number = inputChars.indexOf(targetChar);
 
   const typingKey =
     inputChars[successIndex] === "゛" || inputChars[successIndex] === "゜"
@@ -114,7 +156,7 @@ export const kanaInput = (
   }
 
   if (dakutenInfo?.markType) {
-    const yoon = nextKana.length >= 2 && dakutenInfo.markType ? nextKana[1] : "";
+    const yoon = nextKana.length >= 2 ? nextKana[1] : "";
     newLineWord.nextChunk.kana = dakutenInfo.markType + yoon;
     newLineWord.nextChunk.originalDakutenChar = dakutenInfo.dakuonKana as Dakuten | HanDakuten;
   } else if (nextKana.length >= 2) {
@@ -133,25 +175,23 @@ export const kanaInput = (
   };
 };
 
-const parseDakuHandaku = (originalKana: Dakuten | HanDakuten) => {
-  return {
-    markType: DAKU_LIST.some((char) => char === originalKana) ? "゛" : "゜",
-    seionKana: DAKU_HANDAKU_NORMALIZE_MAP[originalKana],
-    dakuonKana: originalKana,
-  } as const;
-};
-
 const wordUpdate = (typingKey: string, newLineWord: TypingWord) => {
   const romaPattern = newLineWord.nextChunk.romaPatterns;
 
   newLineWord.correct.kana += typingKey;
-  newLineWord.correct.roma += romaPattern[0];
+  // romaPatternsが空の場合の安全策
+  newLineWord.correct.roma += romaPattern && romaPattern.length > 0 ? romaPattern[0] : "";
 
-  newLineWord.nextChunk = newLineWord.wordChunks.shift() || {
-    kana: "",
-    romaPatterns: [""],
-    point: 0,
-    type: undefined,
-  };
+  const nextChunk = newLineWord.wordChunks.shift();
+  if (nextChunk) {
+    newLineWord.nextChunk = nextChunk;
+  } else {
+    newLineWord.nextChunk = {
+      kana: "",
+      romaPatterns: [""],
+      point: 0,
+      type: undefined,
+    };
+  }
   return { newLineWord, isUpdatePoint: true };
 };

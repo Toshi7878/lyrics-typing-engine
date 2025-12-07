@@ -81,7 +81,9 @@ console.log(builtMapLines);
 
 ### 歌詞フレーズ切り替わり時のタイピングワード更新
 
-`createTypingWord(builtMapLine: BuiltMapLine)` - builtMapLinesの行から次のフレーズのタイピングワードを作成
+`createTypingWord(builtMapLine: BuiltMapLine, correct?: { kana: string; roma: string })` - builtMapLinesの行から次のフレーズのタイピングワードを作成
+
+`correct` - 正解したローマ字・かな(デフォルトは空文字列)
 
 ```typescript
 import { createTypingWord } from 'lyrics-typing-engine';

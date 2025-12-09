@@ -88,6 +88,7 @@ const buildWordChunks = (kanaChunks: string[], charPoint: number) => {
   const lastChunk = wordChunks.at(-1);
   if (lastChunk?.kana === "ん") {
     lastChunk.romaPatterns[0] = "nn";
+    lastChunk.romaPatterns.push("n'");
     lastChunk.point = charPoint * lastChunk.romaPatterns[0].length;
   }
 
@@ -109,6 +110,7 @@ const replaceNWithNN = (typeChunks: WordChunk[], charPoint: number) => {
 
     if (isNNPattern && romaPattern) {
       prevChunk.romaPatterns[i] = `${romaPattern}n`;
+      prevChunk.romaPatterns.push("n'");
       prevChunk.point = charPoint * romaPattern.length;
     }
   }

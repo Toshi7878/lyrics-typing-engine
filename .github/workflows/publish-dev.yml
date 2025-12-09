@@ -1,0 +1,35 @@
+name: Publish Dev Package
+on:
+  push:
+    branches:
+      - dev
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  publish-dev:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v5
+        with:
+          node-version: '20'
+          registry-url: 'https://registry.npmjs.org'
+
+      - name: Update npm
+        run: npm install -g npm@latest
+
+      - name: Modify package.json for dev
+        run: |
+          # パッケージ名は変更せず、バージョンのみプレリリース形式に変更
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          npm version "${CURRENT_VERSION}-dev.$(date +%s)" --no-git-tag-version
+
+      - run: npm ci
+      - run: npm run build --if-present
+      - run: npm publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

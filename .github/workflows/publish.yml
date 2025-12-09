@@ -3,9 +3,11 @@ on:
   push:
     tags:
       - 'v*'
+    branches:
+      - dev
 
 permissions:
-  id-token: write  # OIDCに必要
+  id-token: write
   contents: read
 
 jobs:
@@ -22,7 +24,28 @@ jobs:
       - name: Update npm
         run: npm install -g npm@latest
 
+      # devブランチの場合のみバージョンを書き換える
+      - name: Modify package.json for dev
+        if: github.ref == 'refs/heads/dev'
+        run: |
+          # パッケージ名は変更せず、バージョンのみプレリリース形式に変更
+          CURRENT_VERSION=$(npm pkg get version | tr -d '"')
+          npm version "${CURRENT_VERSION}-dev.$(date +%s)" --no-git-tag-version
+
       - run: npm ci
       - run: npm run build --if-present
       # - run: npm test
-      - run: npm publish
+
+      # タグ(v*)の場合は通常公開
+      - name: Publish (Release)
+        if: startsWith(github.ref, 'refs/tags/v')
+        run: npm publish
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+      # devブランチの場合はdevタグで公開
+      - name: Publish (Dev)
+        if: github.ref == 'refs/heads/dev'
+        run: npm publish --tag dev
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}

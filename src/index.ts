@@ -1,6 +1,10 @@
 export { buildTypingMap } from "./build-typing-map/build-map";
 export { parseWordToChunks } from "./build-typing-map/parse-word-to-chunks";
-export { createDisplayWord } from "./create-typing-word/create-display-word";
+export {
+  createDisplayWord,
+  replaceAllSpaceWithLowMacron,
+  replaceAllSpaceWithThreePerEmSpace,
+} from "./create-typing-word/create-display-word";
 export { createTypingWord } from "./create-typing-word/create-typing-word";
 export { isTypingKey } from "./evaluator/is-typing-key";
 export type { TypingInputResult } from "./evaluator/type";

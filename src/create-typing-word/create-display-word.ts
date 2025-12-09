@@ -29,10 +29,10 @@ export const createDisplayWord = (
   return { correct, nextChar, remainWord };
 };
 
-const replaceAllSpaceWithThreePerEmSpace = (text: string) => {
+export const replaceAllSpaceWithThreePerEmSpace = (text: string) => {
   return text.replaceAll(" ", " ");
 };
 
-const replaceAllSpaceWithLowMacron = (text: string) => {
+export const replaceAllSpaceWithLowMacron = (text: string) => {
   return text.replaceAll(" ", "ˍ");
 };

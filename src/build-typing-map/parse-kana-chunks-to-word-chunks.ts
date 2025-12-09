@@ -75,12 +75,12 @@ const buildWordChunks = (kanaChunks: string[], charPoint: number) => {
     const prevKanaChar = wordChunks[wordChunks.length - 2]?.kana ?? "";
     const currentFirstKanaChar = wordChunks[wordChunks.length - 1]?.kana[0];
 
-    if (prevKanaChar[prevKanaChar.length - 1] === "ん" && currentFirstKanaChar) {
-      if (NN_LIST.includes(currentFirstKanaChar)) {
-        wordChunks = replaceNWithNN(wordChunks, charPoint);
-      } else {
-        wordChunks = applyDoubleNTypePattern(wordChunks);
-      }
+    if (
+      prevKanaChar[prevKanaChar.length - 1] === "ん" &&
+      currentFirstKanaChar &&
+      NN_LIST.includes(currentFirstKanaChar)
+    ) {
+      wordChunks = replaceNWithNN(wordChunks, charPoint);
     }
   }
 
@@ -93,24 +93,6 @@ const buildWordChunks = (kanaChunks: string[], charPoint: number) => {
   }
 
   return wordChunks;
-};
-
-const applyDoubleNTypePattern = (typeChunks: WordChunk[]) => {
-  const lastChunk = typeChunks.at(-1);
-  if (!lastChunk) return typeChunks;
-
-  const currentKanaChar = lastChunk.kana;
-  if (currentKanaChar) {
-    //n一つのパターンでもnext typeChunkにnを追加してnnの入力を可能にする
-    const currentRomaPatterns = [...lastChunk.romaPatterns];
-
-    for (const romaPattern of currentRomaPatterns) {
-      lastChunk.romaPatterns.push(`n${romaPattern}`);
-      lastChunk.romaPatterns.push(`'${romaPattern}`);
-    }
-  }
-
-  return typeChunks;
 };
 
 const replaceNWithNN = (typeChunks: WordChunk[], charPoint: number) => {

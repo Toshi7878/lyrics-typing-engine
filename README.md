@@ -217,6 +217,32 @@ console.log(typingResult);
 
 ```
 
+### 表示用タイピングワードの生成
+
+`createDisplayState(typingWord: TypingWord, options?: { remainWord: { maxLength: number } })` - タイピングワードから表示用の状態を生成
+
+`typingWord` - 現在のタイピングワード
+`options.remainWord.maxLength` - 未入力部分の表示文字数上限
+
+入力済みのスペースは "ˍ" (U+02CD) に置換されます。
+未入力半角スペースは " " (U+2004) に置換されます。
+
+```typescript
+import { createDisplayState } from 'lyrics-typing-engine';
+
+const displayState = createDisplayState(typingWord, { remainWord: { maxLength: 20 } });
+console.log(displayState);
+/**
+ * {
+ *   correct: { kana: "こ", roma: "co" },
+ *   nextChar: { kana: "ん", roma: "nn" },
+ *   remainWord: { kana: "にちは", roma: "nitiha" }
+ * }
+ *
+ * // nextChar.roma は nextChunk.romaPatterns の最初のパターンが表示されます
+ */
+```
+
 ### 文字列からタイピングワードの生成
 
 `parseWordToChunks(word: string, charPoint: number)` - 文字列からタイピングワードを生成

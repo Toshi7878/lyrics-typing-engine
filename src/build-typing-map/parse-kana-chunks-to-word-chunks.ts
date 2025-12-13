@@ -1,10 +1,9 @@
 import type { WordChunk } from "../type";
+import { NN_PATTERN_SET } from "../utils/const";
 import { isAlphabet } from "../utils/is-alphabet";
 import { convertZenkakuToHankaku } from "../utils/zenkaku-to-hankaku";
 import { NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
 
-// biome-ignore format:<>
-const NN_LIST = ["あ", "い", "う", "え", "お", "な", "に", "ぬ", "ね", "の", "や", "ゆ", "よ", "ん", "'", "’", "a", "i", "u", "e", "o", "y", "n", "A", "I", "U", "E", "O", "Y", "N"];
 // biome-ignore format:<>
 const SOKUON_JOIN_LIST = ["ヰ", "ゐ", "ヱ", "ゑ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "っ", "ゎ", "ヵ", "ヶ", "ゔ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ", "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];
 const KANA_UNSUPPORTED_SYMBOLS = ["←", "↓", "↑", "→"];
@@ -78,7 +77,7 @@ const buildWordChunks = (kanaChunks: string[], charPoint: number) => {
     if (
       prevKanaChar[prevKanaChar.length - 1] === "ん" &&
       currentFirstKanaChar &&
-      NN_LIST.includes(currentFirstKanaChar)
+      NN_PATTERN_SET.has(currentFirstKanaChar)
     ) {
       wordChunks = replaceNWithNN(wordChunks, charPoint);
     }

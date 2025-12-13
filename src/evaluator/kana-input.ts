@@ -105,7 +105,9 @@ export const kanaInput = (
   const workingWord: TypingWord = {
     correct: { ...lineWord.correct },
     nextChunk: { ...lineWord.nextChunk },
-    wordChunks: [...lineWord.wordChunks],
+    wordChunks: lineWord.wordChunks,
+    wordChunksIndex: lineWord.wordChunksIndex,
+    tempRomaPatterns: lineWord.tempRomaPatterns,
   };
   const newLineWord = workingWord;
 
@@ -182,9 +184,10 @@ const wordUpdate = (typingKey: string, newLineWord: TypingWord) => {
   // romaPatternsが空の場合の安全策
   newLineWord.correct.roma += romaPattern && romaPattern.length > 0 ? romaPattern[0] : "";
 
-  const nextChunk = newLineWord.wordChunks.shift();
+  const nextChunk = newLineWord.wordChunks[newLineWord.wordChunksIndex];
   if (nextChunk) {
     newLineWord.nextChunk = nextChunk;
+    newLineWord.wordChunksIndex++;
   } else {
     newLineWord.nextChunk = {
       kana: "",

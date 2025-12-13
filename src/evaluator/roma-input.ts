@@ -28,18 +28,30 @@ export const romaMakeInput = (
   };
 };
 
-const Z_COMMAND_MAP = {
-  "...": {
-    kana: "...",
-    romaPatterns: ["z.", "z,."],
-    type: "symbol" as const,
-  },
-  "..": {
-    kana: "..",
-    romaPatterns: ["z,"],
-    type: "symbol" as const,
-  },
-} satisfies Record<string, Omit<WordChunk, "point">>;
+const handleExceptionNnPatternInput = (
+  lineWord: TypingWord,
+  code: string,
+): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
+  const expectedNextKey = code === "KeyX" ? "ん" : "う";
+  const nextChunk = lineWord.nextChunk;
+  const correctRoma = lineWord.correct.roma;
+
+  const lastRomaChar = correctRoma.length > 0 ? correctRoma[correctRoma.length - 1] : "";
+
+  const isNNRoute = nextChunk.kana === "ん" && lastRomaChar === "n" && nextChunk.romaPatterns[0] === "n";
+
+  const nextWordChunk = lineWord.wordChunks[lineWord.wordChunksIndex];
+  const isNext = nextWordChunk?.kana === expectedNextKey;
+
+  if (isNNRoute && isNext && nextWordChunk) {
+    lineWord.correct.kana += "ん";
+    lineWord.nextChunk = nextWordChunk;
+    lineWord.wordChunksIndex++;
+    return { newLineWord: lineWord, isUpdatePoint: true };
+  }
+
+  return { newLineWord: lineWord, isUpdatePoint: false };
+};
 
 export const romaInput = (
   typingInput: TypingInput,
@@ -79,8 +91,6 @@ export const romaInput = (
 
   newLineWord.nextChunk.romaPatterns = updateNextRomaPattern(inputChar, nextRomaPattern);
 
-  // TODO: temp nn
-
   const filteredWord = processSokuonAndYoon(newLineWord.nextChunk.kana, inputChar, newLineWord);
 
   const result = updateChunk(inputChar, filteredWord, isUpdatePoint);
@@ -94,14 +104,18 @@ const processedLineWord = (
 ): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
   const code = typingInput.code;
 
+  if (code === "KeyX" || code === "KeyW") {
+    return handleExceptionNnPatternInput(lineWord, code);
+  }
+
   if (code === "KeyZ" && !typingInput.shift) {
-    return zCommand(lineWord);
+    return processZCommand(lineWord);
   }
 
   return { newLineWord: lineWord, isUpdatePoint: false };
 };
 
-const zCommand = (lineWord: TypingWord): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
+const processZCommand = (lineWord: TypingWord): { newLineWord: TypingWord; isUpdatePoint: boolean } => {
   const nextChunk = lineWord.nextChunk;
   const firstChunk = lineWord.wordChunks[lineWord.wordChunksIndex];
   const secondChunk = lineWord.wordChunks[lineWord.wordChunksIndex + 1];
@@ -109,6 +123,19 @@ const zCommand = (lineWord: TypingWord): { newLineWord: TypingWord; isUpdatePoin
   const doublePeriod = nextChunk.kana === "." && firstChunk?.kana === ".";
 
   if (doublePeriod) {
+    const Z_COMMAND_MAP = {
+      "...": {
+        kana: "...",
+        romaPatterns: ["z.", "z,."],
+        type: "symbol" as const,
+      },
+      "..": {
+        kana: "..",
+        romaPatterns: ["z,"],
+        type: "symbol" as const,
+      },
+    } satisfies Record<string, Omit<WordChunk, "point">>;
+
     const charPoint = nextChunk.point;
     const triplePeriod = doublePeriod && secondChunk?.kana === ".";
 
@@ -180,7 +207,7 @@ const updateNextRomaPattern = (eventKey: string, nextRomaPattern: string[]): str
   const len = nextRomaPattern.length;
   for (let i = 0; i < len; i++) {
     const pattern = nextRomaPattern[i];
-    if (pattern && pattern.startsWith(eventKey)) {
+    if (pattern?.startsWith(eventKey)) {
       const sliced = pattern.slice(1);
       if (sliced !== "") {
         result.push(sliced);
@@ -219,7 +246,6 @@ const updateChunk = (eventKey: string, newLineWord: TypingWord, _isUpdatePoint: 
       newLineWord.nextChunk = nextChunk;
       newLineWord.wordChunksIndex++;
 
-      // tempRomaPatterns処理
       if (!NN_PATTERN_SET.has(nextChunk.kana)) {
         newLineWord.tempRomaPatterns = ["n", "'"];
       } else {

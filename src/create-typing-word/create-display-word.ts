@@ -16,8 +16,14 @@ export const createDisplayWord = (
     roma: replaceAllSpaceWithThreePerEmSpace(typingWord.nextChunk.romaPatterns[0] ?? ""),
   };
 
-  const remainKana = typingWord.wordChunks.map((chunk) => chunk.kana).join("");
-  const remainRoma = typingWord.wordChunks.map((chunk) => chunk.romaPatterns[0]).join("");
+  const remainKana = typingWord.wordChunks
+    .slice(typingWord.wordChunksIndex)
+    .map((chunk) => chunk.kana)
+    .join("");
+  const remainRoma = typingWord.wordChunks
+    .slice(typingWord.wordChunksIndex)
+    .map((chunk) => chunk.romaPatterns[0])
+    .join("");
 
   const maxLength = options?.remainWord?.maxLength;
 

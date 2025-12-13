@@ -19,6 +19,8 @@ export interface TypingWord {
   correct: { kana: string; roma: string };
   nextChunk: WordChunk & { originalDakutenChar?: Dakuten | HanDakuten };
   wordChunks: WordChunk[];
+  wordChunksIndex: number;
+  tempRomaPatterns?: string[];
 }
 
 export interface BuiltMapLine<TOptions = unknown> {

@@ -252,19 +252,19 @@ const updateChunk = (eventKey: string, newLineWord: TypingWord, _isUpdatePoint: 
     isUpdatePoint = true;
 
     const nextChunk = newLineWord.wordChunks[newLineWord.wordChunksIndex];
+
     if (nextChunk) {
       newLineWord.tempRomaPatterns = updateTempRomaPatterns(newLineWord, nextChunk);
-      newLineWord.nextChunk = nextChunk;
       newLineWord.wordChunksIndex++;
-    } else {
-      newLineWord.nextChunk = {
-        kana: "",
-        romaPatterns: [""],
-        point: 0,
-        type: undefined,
-      };
     }
+
     newLineWord.correct.kana += newLineWord.nextChunk.kana;
+    newLineWord.nextChunk = nextChunk ?? {
+      kana: "",
+      romaPatterns: [""],
+      point: 0,
+      type: undefined,
+    };
   }
 
   newLineWord.correct.roma += eventKey;

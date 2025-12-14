@@ -73,7 +73,7 @@ export const executeTypingInput = ({
   const { newLineWord, successKey, failKey, isUpdatePoint } =
     inputMode === "roma"
       ? romaInput(typingInput, typingWord, isCaseSensitive)
-      : kanaInput(typingInput, { ...typingWord }, isCaseSensitive);
+      : kanaInput(typingInput, typingWord, isCaseSensitive);
 
   return {
     nextTypingWord: newLineWord,

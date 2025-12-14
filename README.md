@@ -250,7 +250,20 @@ console.log(displayState);
  */
 ```
 
-### 文字列からタイピングワードの生成
+### タイピングワード再生成
+かな入力 → ローマ字入力 の切り替え時に使用します。
+
+`recreateTypingWord(typingWord: TypingWord)` - 入力モードをローマ字に切り替えた際のタイピングワードを再生成
+
+`typingWord` - 現在のタイピングワード
+
+```typescript
+import { recreateTypingWord } from 'lyrics-typing-engine';
+
+const newTypingWord = recreateTypingWord(currentTypingWord);
+```
+
+```typescript
 
 `parseWordToChunks(word: string, charPoint: number)` - 文字列からタイピングワードを生成
 

@@ -248,7 +248,7 @@ const updateChunk = (eventKey: string, newLineWord: TypingWord, _isUpdatePoint: 
 
       const lastKanaCorrect = newLineWord.correct.kana.at(-1);
       const lastRomaCorrect = newLineWord.correct.roma.at(-1);
-      if (lastKanaCorrect === "ん" && lastRomaCorrect === "x" && !NN_PATTERN_SET.has(nextChunk.kana)) {
+      if (lastKanaCorrect === "ん" && lastRomaCorrect !== "x" && !NN_PATTERN_SET.has(nextChunk.kana)) {
         newLineWord.tempRomaPatterns = ["n", "'"];
       } else {
         newLineWord.tempRomaPatterns = undefined;

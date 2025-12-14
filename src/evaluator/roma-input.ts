@@ -83,10 +83,21 @@ export const romaInput = (
     };
   }
 
-  const isSuccess = isMatchRomaPattern(nextRomaPattern, inputChar, isCaseSensitive, newLineWord.tempRomaPatterns);
+  const { isSuccess, isTempMatch } = isMatchRomaPattern(
+    nextRomaPattern,
+    inputChar,
+    isCaseSensitive,
+    newLineWord.tempRomaPatterns,
+  );
 
   if (!isSuccess) {
     return { newLineWord, successKey: undefined, failKey: typingInput.key, isUpdatePoint: false };
+  }
+
+  if (isTempMatch) {
+    newLineWord.correct.roma += inputChar;
+    newLineWord.tempRomaPatterns = undefined;
+    return { newLineWord, successKey: inputChar, failKey: undefined, isUpdatePoint: false };
   }
 
   newLineWord.nextChunk.romaPatterns = updateNextRomaPattern(inputChar, nextRomaPattern);
@@ -163,7 +174,7 @@ const isMatchRomaPattern = (
   inputChar: string,
   isCaseSensitive: boolean,
   tempRomaPatterns?: string[],
-): boolean => {
+): { isSuccess: boolean; isTempMatch: boolean } => {
   const patternLen = nextRomaPattern.length;
   const tempPatternLen = tempRomaPatterns ? tempRomaPatterns.length : 0;
 
@@ -171,14 +182,14 @@ const isMatchRomaPattern = (
     for (let i = 0; i < patternLen; i++) {
       const pattern = nextRomaPattern[i];
       if (pattern && pattern.charAt(0) === inputChar) {
-        return true;
+        return { isSuccess: true, isTempMatch: false };
       }
     }
     if (tempPatternLen > 0 && tempRomaPatterns) {
       for (let i = 0; i < tempPatternLen; i++) {
         const pattern = tempRomaPatterns[i];
         if (pattern && pattern.charAt(0) === inputChar) {
-          return true;
+          return { isSuccess: true, isTempMatch: true };
         }
       }
     }
@@ -187,19 +198,19 @@ const isMatchRomaPattern = (
     for (let i = 0; i < patternLen; i++) {
       const pattern = nextRomaPattern[i];
       if (pattern && pattern.charAt(0).toLowerCase() === lowerInputChar) {
-        return true;
+        return { isSuccess: true, isTempMatch: false };
       }
     }
     if (tempPatternLen > 0 && tempRomaPatterns) {
       for (let i = 0; i < tempPatternLen; i++) {
         const pattern = tempRomaPatterns[i];
         if (pattern && pattern.charAt(0).toLowerCase() === lowerInputChar) {
-          return true;
+          return { isSuccess: true, isTempMatch: true };
         }
       }
     }
   }
-  return false;
+  return { isSuccess: false, isTempMatch: false };
 };
 
 const updateNextRomaPattern = (eventKey: string, nextRomaPattern: string[]): string[] => {

@@ -107,11 +107,13 @@ const timer = () => {
  *   correct: { kana: "", roma: "" },
  *   nextChunk: { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
  *   wordChunks: [
+ *     { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
  *     { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
  *     { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
  *     { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
  *     { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" }
- *   ]
+ *   ],
+ *   wordChunksIndex: 1,
  * }
  */
 ```
@@ -154,10 +156,13 @@ document.addEventListener('keydown', (event) => {
  *     correct: { kana: "こ", roma: "co" },
  *     nextChunk: { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
  *     wordChunks: [
+ *       { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
+ *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
  *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
  *       { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
  *       { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" }
- *     ]
+ *     ],
+ *     wordChunksIndex: 2
  *   },
  *   successKey: "o",
  *   failKey: undefined,
@@ -201,11 +206,13 @@ console.log(typingResult);
  *     correct: { kana: "", roma: "c" },
  *     nextChunk: { kana: "こ", romaPatterns: ["o"], point: 100, type: "kana" },
  *     wordChunks: [
+ *       { kana: "こ", romaPatterns: ["ko", "co"], point: 100, type: "kana" },
  *       { kana: "ん", romaPatterns: ["nn", "'n", "xn"], point: 100, type: "kana" },
  *       { kana: "に", romaPatterns: ["ni"], point: 100, type: "kana" },
  *       { kana: "ち", romaPatterns: ["ti", "chi"], point: 100, type: "kana" },
  *       { kana: "は", romaPatterns: ["ha"], point: 100, type: "kana" },
- *     ]
+ *     ],
+ *     wordChunksIndex: 1
  *   },
  *   successKey: "c",
  *   failKey: undefined,
@@ -260,6 +267,7 @@ console.log(createTypingWord({ wordChunks }));
  *   correct: { kana: "", roma: "" },
  *   nextChunk: { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
  *   wordChunks: [
+ *     { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
  *     { kana: "っと", romaPatterns: ["tto", "ltutto", "xtutto", "ltsutto", "xtsutto"], point: 150, type: "kana" },
  *     { kana: "ひ", romaPatterns: ["hi"], point: 100, type: "kana" },
  *     { kana: "も", romaPatterns: ["mo"], point: 100, type: "kana" },
@@ -267,7 +275,8 @@ console.log(createTypingWord({ wordChunks }));
  *     { kana: "し", romaPatterns: ["si", "shi", "ci"], point: 100, type: "kana" },
  *     { kana: "ば", romaPatterns: ["ba"], point: 100, type: "kana" },
  *     { kana: "る", romaPatterns: ["ru"], point: 100, type: "kana" }
- *   ]
+ *   ],
+ *   wordChunksIndex: 1
  * }
  */
 
@@ -334,7 +343,9 @@ type InputMode = "roma" | "kana";
 interface TypingWord {
   correct: { kana: string; roma: string }; // 正解したローマ字・かな
   nextChunk: WordChunk; // 次のタイピングチャンク
-  wordChunks: WordChunk[]; // 残りタイピングワード
+  wordChunks: WordChunk[]; // 全タイピングワード
+  wordChunksIndex: number; // 現在のwordChunksの位置
+  tempRomaPatterns?: string[]; // 一時的なローマ字パターン
 }
 
 // タイピング入力時の判定 型

@@ -251,48 +251,15 @@ console.log(displayState);
 ```
 
 ### タイピングワード再生成
-かな入力 → ローマ字入力 の切り替え時に使用します。
 
-`recreateTypingWord(typingWord: TypingWord)` - 入力モードをローマ字に切り替えた際のタイピングワードを再生成
+かな入力 → ローマ字入力 の動的なモード切り替え時に使用します。
 
-`typingWord` - 現在のタイピングワード
+`recreateTypingWord(typingWord: TypingWord)` - タイピングワードを再生成します。
 
 ```typescript
 import { recreateTypingWord } from 'lyrics-typing-engine';
 
 const newTypingWord = recreateTypingWord(currentTypingWord);
-```
-
-```typescript
-
-`parseWordToChunks(word: string, charPoint: number)` - 文字列からタイピングワードを生成
-
-タイピング中の入力モード切り替え機能などで活用できます
-
-```typescript
-import { parseWordToChunks } from 'lyrics-typing-engine';
-
-const wordChunks = parseWordToChunks({ word: "きゅっとひもをしばる", charPoint: 50 });
-
-console.log(createTypingWord({ wordChunks }));
-/**
- * {
- *   correct: { kana: "", roma: "" },
- *   nextChunk: { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
- *   wordChunks: [
- *     { kana: "きゅ", romaPatterns: ["kyu", "kilyu", "kixyu"], point: 150, type: "kana" },
- *     { kana: "っと", romaPatterns: ["tto", "ltutto", "xtutto", "ltsutto", "xtsutto"], point: 150, type: "kana" },
- *     { kana: "ひ", romaPatterns: ["hi"], point: 100, type: "kana" },
- *     { kana: "も", romaPatterns: ["mo"], point: 100, type: "kana" },
- *     { kana: "を", romaPatterns: ["wo"], point: 100, type: "kana" },
- *     { kana: "し", romaPatterns: ["si", "shi", "ci"], point: 100, type: "kana" },
- *     { kana: "ば", romaPatterns: ["ba"], point: 100, type: "kana" },
- *     { kana: "る", romaPatterns: ["ru"], point: 100, type: "kana" }
- *   ],
- *   wordChunksIndex: 1
- * }
- */
-
 ```
 
 ## カスタムオプション

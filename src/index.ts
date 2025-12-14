@@ -1,5 +1,4 @@
 export { buildTypingMap } from "./build-typing-map/build-map";
-export { parseWordToChunks } from "./build-typing-map/parse-word-to-chunks";
 export {
   createDisplayWord,
   replaceAllSpaceWithLowMacron,

@@ -249,21 +249,13 @@ const updateChunk = (eventKey: string, newLineWord: TypingWord, _isUpdatePoint: 
   let isUpdatePoint = _isUpdatePoint;
 
   if (romaPattern.length === 0) {
-    newLineWord.correct.kana += newLineWord.nextChunk.kana;
     isUpdatePoint = true;
 
     const nextChunk = newLineWord.wordChunks[newLineWord.wordChunksIndex];
     if (nextChunk) {
+      newLineWord.tempRomaPatterns = updateTempRomaPatterns(newLineWord, nextChunk);
       newLineWord.nextChunk = nextChunk;
       newLineWord.wordChunksIndex++;
-
-      const lastKanaCorrect = newLineWord.correct.kana.at(-1);
-      const lastRomaCorrect = newLineWord.correct.roma.at(-1);
-      if (lastKanaCorrect === "ん" && lastRomaCorrect !== "x" && !NN_PATTERN_SET.has(nextChunk.kana)) {
-        newLineWord.tempRomaPatterns = ["n", "'"];
-      } else {
-        newLineWord.tempRomaPatterns = undefined;
-      }
     } else {
       newLineWord.nextChunk = {
         kana: "",
@@ -272,9 +264,19 @@ const updateChunk = (eventKey: string, newLineWord: TypingWord, _isUpdatePoint: 
         type: undefined,
       };
     }
+    newLineWord.correct.kana += newLineWord.nextChunk.kana;
   }
 
   newLineWord.correct.roma += eventKey;
 
   return { newLineWord, isUpdatePoint };
+};
+
+const updateTempRomaPatterns = (newLineWord: TypingWord, nextChunk: WordChunk) => {
+  const kanaChunk = newLineWord.nextChunk.kana;
+  const lastRomaCorrect = newLineWord.correct.roma.at(-1);
+  if (kanaChunk === "ん" && lastRomaCorrect !== "x" && !NN_PATTERN_SET.has(nextChunk.kana)) {
+    return ["n", "'"];
+  }
+  return undefined;
 };

@@ -2,11 +2,39 @@
 
 音楽に同期したタイピングゲーム用のエンジンライブラリ。歌詞データからタイピングマップを生成し、ローマ字入力・かな入力の判定を行います。
 
+**前提:** キー入力はブラウザの `KeyboardEvent` を想定しています。パッケージは ESM（`"type": "module"`）として公開されています。
+
+**リポジトリ:** [github.com/Toshi7878/lyrics-typing-engine](https://github.com/Toshi7878/lyrics-typing-engine)
+
+## 目次
+
+- [インストール](#インストール)
+- [処理の流れ（概要）](#処理の流れ概要)
+- [機能](#機能)
+  - [タイピング譜面データの構築](#タイピング譜面データの構築)
+  - [歌詞フレーズ切り替わり時のタイピングワード更新](#歌詞フレーズ切り替わり時のタイピングワード更新)
+  - [入力の判定](#入力の判定)
+  - [`handleTyping`（コールバック形式）](#handletypingコールバック形式)
+  - [リプレイ再生用の入力判定関数](#リプレイ再生用の入力判定関数)
+  - [表示用タイピングワードの生成](#表示用タイピングワードの生成)
+  - [タイピングワード再生成](#タイピングワード再生成)
+- [カスタムオプション](#カスタムオプション)
+- [import 可能な型](#import-可能な型)
+- [ライセンス](#ライセンス)
+- [作者](#作者)
+
 ## インストール
 
 ```bash
 npm install lyrics-typing-engine
 ```
+
+## 処理の流れ（概要）
+
+1. `buildTypingMap()` で譜面（`BuiltMapLine[]`）を生成する  
+2. 再生位置に合わせて `createTypingWord()` で現在フレーズの `TypingWord` を作る  
+3. `keydown` などで `evaluateRomaInput` / `evaluateKanaInput`（または `handleTyping` / `executeTypingInput`）で状態を更新する  
+4. UI には `createDisplayWord()` の戻り値を使う  
 
 ## 機能
 
@@ -14,20 +42,21 @@ npm install lyrics-typing-engine
 
 `buildTypingMap()`
 
-`rawMapLines` - ビルド前のタイピング譜面データ
+- `rawMapLines` — ビルド前のタイピング譜面データ
+- `charPoint` — ローマ字換算での 1 打鍵あたりのポイント
 
-`charPoint` - ローマ字換算での1打鍵あたりのポイント
+各行の `time` は **秒**（再生タイムラインと同じ単位の数値）です。`string` も渡せますが、内部で `Number()` 化されます。
 
 ```typescript
 import { buildTypingMap, type RawMapLine } from 'lyrics-typing-engine';
 
 /**
- * @note 重要: タイピング譜面データはtime:0から始まり、最後の歌詞は"end"にする必要があります。
+ * @note 重要: タイピング譜面データは time: 0 から始まり、最後の歌詞は "end" にする必要があります。
  */
 const rawMapLines: RawMapLine[] = [
   { time: 0, lyrics: "こんにちは", word: "こんにちは" },
   { time: 3.5, lyrics: "世界", word: "せかい" },
-  { time: 6.0, lyrics: "end", word: "" }
+  { time: 6.0, lyrics: "end", word: "" },
 ];
 
 const builtMapLines = buildTypingMap({ rawMapLines, charPoint: 50 });
@@ -81,26 +110,26 @@ console.log(builtMapLines);
 
 ### 歌詞フレーズ切り替わり時のタイピングワード更新
 
-`createTypingWord(builtMapLine: BuiltMapLine, correct?: { kana: string; roma: string })` - builtMapLinesの行から次のフレーズのタイピングワードを作成
+`createTypingWord(builtMapLine: BuiltMapLine, correct?: { kana: string; roma: string })` — `builtMapLines` の行から次のフレーズのタイピングワードを作成します。
 
-`correct` - 正解したローマ字・かな(デフォルトは空文字列)
+`correct` — 正解したローマ字・かな（デフォルトは空文字列）
 
 ```typescript
 import { createTypingWord } from 'lyrics-typing-engine';
 
-const count = 0;
+// builtMapLines は buildTypingMap の戻り値とする
+let lineIndex = 0;
 
 const timer = () => {
   const currentTime = video.getCurrentTime();
-  const nextLine = builtMapLines[count + 1];
+  const nextLine = builtMapLines[lineIndex + 1];
 
-  if (currentTime >= nextLine.time) {
-    count++;
-    const newTypingWord = createTypingWord(nextLine);
+  if (nextLine && currentTime >= nextLine.time) {
+    lineIndex++;
+    const newTypingWord = createTypingWord(builtMapLines[lineIndex]);
     console.log(newTypingWord);
   }
-
-}
+};
 
 /**
  * {
@@ -120,13 +149,13 @@ const timer = () => {
 
 ### 入力の判定
 
-`isTypingKey(event: KeyboardEvent)` - イベント時の文字入力キー判定
+`isTypingKey(event: KeyboardEvent)` — イベント時の文字入力キー判定
 
-`evaluateRomaInput({ event, typingWord, isCaseSensitive? })` - ローマ字入力時の判定
+`evaluateRomaInput({ event, typingWord, isCaseSensitive? })` — ローマ字入力時の判定
 
-`evaluateKanaInput({ event, typingWord, isCaseSensitive? })` - かな入力時の判定
+`evaluateKanaInput({ event, typingWord, isCaseSensitive? })` — かな入力時の判定
 
-`isCaseSensitive` - 大文字小文字を区別するかどうか(デフォルトはfalse)
+`isCaseSensitive` — 大文字小文字を区別するかどうか（デフォルトは `false`）
 
 ```typescript
 import { isTypingKey, evaluateRomaInput, evaluateKanaInput } from 'lyrics-typing-engine';
@@ -173,22 +202,56 @@ document.addEventListener('keydown', (event) => {
  */
 ```
 
+### `handleTyping`（コールバック形式）
+
+`evaluateRomaInput` / `evaluateKanaInput` をラップし、成功・ワード完了・ミスをコールバックで受け取れます。`onSuccess` の戻り値の型をジェネリックに渡せます（`isCompleted` 時に `onCompleted` へ引き渡されます）。
+
+`inputMode` が `"roma"` 以外（`"kana"` / `"flick"`）のときはかな側の評価になります。
+
+```typescript
+import { handleTyping, isTypingKey } from 'lyrics-typing-engine';
+
+document.addEventListener('keydown', (event) => {
+  if (!isTypingKey(event)) return;
+
+  handleTyping(
+    { event, inputMode: 'roma', typingWord },
+    {
+      onSuccess: ({ nextTypingWord, successKey, isCompleted, updatePoint, chunkType }) => {
+        // UI 更新・スコア加算など
+        return { nextTypingWord };
+      },
+      onCompleted: (payload) => {
+        // 1 ワード入力完了時（onSuccess の戻り値が渡る）
+      },
+      onMiss: ({ failKey }) => {
+        // ミス時
+      },
+    },
+  );
+});
+```
+
 ### リプレイ再生用の入力判定関数
 
 `executeTypingInput({ inputChar, inputMode, typingWord, isCaseSensitive? })`
 
-`isCaseSensitive` - 大文字小文字を区別するかどうか(デフォルトはfalse)
+`isCaseSensitive` — 大文字小文字を区別するかどうか（デフォルトは `false`）
+
+`inputMode` が `"roma"` 以外のときはかな入力として扱われます。
 
 ```typescript
 import { executeTypingInput } from 'lyrics-typing-engine';
 
 const replayData = [
-  startInputMode: "roma",
-  typeResults: [
-    { time: 0, char: "c", isSuccess: true }
-    { time: 1, char: "o", isSuccess: true }
-    { time: 2, char: "a", isSuccess: false }
-  ]
+  {
+    startInputMode: 'roma' as const,
+    typeResults: [
+      { time: 0, char: 'c', isSuccess: true },
+      { time: 1, char: 'o', isSuccess: true },
+      { time: 2, char: 'a', isSuccess: false },
+    ],
+  },
 ];
 
 const typeResults = replayData[0].typeResults;
@@ -196,7 +259,7 @@ const inputMode = replayData[0].startInputMode;
 const typingResult = executeTypingInput({
   inputChar: typeResults[0].char,
   inputMode,
-  typingWord
+  typingWord,
 });
 console.log(typingResult);
 
@@ -221,23 +284,23 @@ console.log(typingResult);
  *   updatePoint: 0
  * }
  */
-
 ```
 
 ### 表示用タイピングワードの生成
 
-`createDisplayState(typingWord: TypingWord, options?: { remainWord: { maxLength: number } })` - タイピングワードから表示用の状態を生成
+`createDisplayWord(typingWord: TypingWord, options?: { remainWord: { maxLength: number } })` — タイピングワードから表示用の状態を生成します。
 
-`typingWord` - 現在のタイピングワード
-`options.remainWord.maxLength` - 未入力部分の表示文字数上限
+- `typingWord` — 現在のタイピングワード
+- `options.remainWord.maxLength` — 未入力部分の表示文字数上限
 
-入力済みのスペースは "ˍ" (U+02CD) に置換されます。
-未入力半角スペースは " " (U+2004) に置換されます。
+入力済みのスペースは `ˍ` (U+02CD) に置換されます。未入力の半角スペースは ` ` (U+2004) に置換されます。
+
+同ファイルから `replaceAllSpaceWithLowMacron` / `replaceAllSpaceWithThreePerEmSpace` も export されています。
 
 ```typescript
-import { createDisplayState } from 'lyrics-typing-engine';
+import { createDisplayWord } from 'lyrics-typing-engine';
 
-const displayState = createDisplayState(typingWord, { remainWord: { maxLength: 20 } });
+const displayState = createDisplayWord(typingWord, { remainWord: { maxLength: 20 } });
 console.log(displayState);
 /**
  * {
@@ -252,9 +315,9 @@ console.log(displayState);
 
 ### タイピングワード再生成
 
-かな入力 → ローマ字入力 の動的なモード切り替え時に使用します。
+かな入力 → ローマ字入力の動的なモード切り替え時に使用します。
 
-`recreateTypingWord(typingWord: TypingWord)` - タイピングワードを再生成します。
+`recreateTypingWord(typingWord: TypingWord)` — タイピングワードを再生成します。
 
 ```typescript
 import { recreateTypingWord } from 'lyrics-typing-engine';
@@ -267,6 +330,8 @@ const newTypingWord = recreateTypingWord(currentTypingWord);
 ジェネリック型で独自のオプションを定義できます。
 
 ```typescript
+import { buildTypingMap, type RawMapLine } from 'lyrics-typing-engine';
+
 interface MyOptions {
   changeCSS?: string;
   changeVideoSpeed?: number;
@@ -277,8 +342,8 @@ const rawMapLines: RawMapLine<MyOptions>[] = [
     time: 0,
     lyrics: "歌詞",
     word: "かし",
-    options: { changeCSS: "color: red;" }
-  }
+    options: { changeCSS: "color: red;" },
+  },
 ];
 
 const builtMapLines = buildTypingMap<MyOptions>({ rawMapLines, charPoint: 0 });
@@ -286,62 +351,60 @@ const builtMapLines = buildTypingMap<MyOptions>({ rawMapLines, charPoint: 0 });
 
 ## import 可能な型
 
+パッケージに含まれる `dist/*.d.ts` が正本です。以下は主要フィールドの要約です。
+
 ```typescript
 // ビルド前タイピング譜面データ型
 interface RawMapLine<TOptions = unknown> {
-  time: string | number; // 時間(ミリ秒)
+  time: string | number; // 行の開始時刻（秒。再生位置と同じ単位）
   lyrics: string; // 歌詞
   word: string; // ひらがなで記述されたタイピングワード
-  options?: TOptions; // オプション(カスタムオプション)
+  options?: TOptions; // オプション（カスタムオプション）
 }
 
 // ビルド済みタイピング譜面データ型
 interface BuiltMapLine<TOptions = unknown> {
-  time: number; // 時間(ミリ秒)
-  duration: number; // 行の時間の長さ(秒) - 次の行のtimeとの差分
+  time: number; // 行の開始時刻（秒）
+  duration: number; // 行の長さ（秒）— 次の行の time との差分
   wordChunks: WordChunk[]; // ビルド済みタイピングワード
   lyrics: string; // 歌詞
   kpm: { kana: number; roma: number }; // フレーズの要求速度
   notes: { kana: number; roma: number }; // フレーズの要求打鍵数
   kanaLyrics: string; // かな表記の歌詞
-  romaLyrics: string; // ローマ字表記の歌詞(各chunkの最初のパターン)
-  options?: TOptions; // オプション(カスタムオプション)
+  romaLyrics: string; // ローマ字表記の歌詞（各 chunk の最初のパターン）
+  options?: TOptions; // オプション（カスタムオプション）
 }
 
-// ビルド済みタイピングチャンク 型
+// ビルド済みタイピングチャンク型
 interface WordChunk {
   kana: string; // ひらがな
   romaPatterns: string[]; // ローマ字パターン
   point: number; // ポイント
   type: "kana" | "alphabet" | "num" | "symbol" | "space" | undefined; // タイピングチャンクの種類
+  kanaUnSupportedSymbol?: string;
 }
 
-// タイピングモード 型
-type InputMode = "roma" | "kana";
+// タイピングモード型
+type InputMode = "roma" | "kana" | "flick";
 
-// タイピングワード 型
+// タイピングワード型（nextChunk は WordChunk に濁点まわりの拡張が付く場合があります）
 interface TypingWord {
   correct: { kana: string; roma: string }; // 正解したローマ字・かな
   nextChunk: WordChunk; // 次のタイピングチャンク
   wordChunks: WordChunk[]; // 全タイピングワード
-  wordChunksIndex: number; // 現在のwordChunksの位置
+  wordChunksIndex: number; // 現在の wordChunks の位置
   tempRomaPatterns?: string[]; // 一時的なローマ字パターン
 }
 
-// タイピング入力時の判定 型
+// タイピング入力時の判定型
 interface TypingInputResult {
-  nextTypingWord: TypingWord; // 更新後のタイピングワード (ミス時は実質更新されません)
+  nextTypingWord: TypingWord; // 更新後のタイピングワード（ミス時は実質更新されません）
   successKey: string | undefined; // 正解時の入力キー
   failKey: string | undefined; // ミス時の入力キー
   chunkType: WordChunk["type"]; // 入力したタイピングチャンクの種類
   isCompleted: boolean; // 打ち切り判定
   updatePoint: number; // 加算ポイント
 }
-
-
-
-
-
 ```
 
 ## ライセンス

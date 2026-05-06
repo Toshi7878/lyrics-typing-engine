@@ -1,7 +1,7 @@
-import type { Dakuten, HanDakuten, TypingWord, WordChunk } from "../type";
-import { isAlphabet } from "../utils/is-alphabet";
-import { CODE_TO_KANA, DAKU_HANDAKU_NORMALIZE_MAP, KEY_TO_KANA, KEYBOARD_CHARS } from "./const";
-import type { TypingInput } from "./type";
+import type { Dakuten, HanDakuten, TypingWord, WordChunk } from "../type.js";
+import { isAlphabet } from "../utils/is-alphabet.js";
+import { CODE_TO_KANA, DAKU_HANDAKU_NORMALIZE_MAP, KEY_TO_KANA, KEYBOARD_CHARS } from "./const.js";
+import type { TypingInput } from "./type.js";
 
 export const kanaMakeInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "keyCode" | "getModifierState">,

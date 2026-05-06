@@ -1,8 +1,8 @@
-import type { BuiltMapLine, RawMapLine, WordChunk } from "../type";
-import { zip } from "../utils/array";
-import { countKanaWordWithDakuonSplit } from "../utils/kana";
-import { parseKanaChunks } from "./parse-kana-chunks";
-import { parseKanaChunksToWordChunks } from "./parse-kana-chunks-to-word-chunks";
+import type { BuiltMapLine, RawMapLine, WordChunk } from "../type.js";
+import { zip } from "../utils/array.js";
+import { countKanaWordWithDakuonSplit } from "../utils/kana.js";
+import { parseKanaChunks } from "./parse-kana-chunks.js";
+import { parseKanaChunksToWordChunks } from "./parse-kana-chunks-to-word-chunks.js";
 
 export const buildTypingMap = <TOptions = unknown>({
   rawMapLines,

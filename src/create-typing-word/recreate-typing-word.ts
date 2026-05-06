@@ -1,6 +1,6 @@
-import { parseWordToChunks } from "../build-typing-map/parse-word-to-chunks";
-import type { TypingWord, WordChunk } from "../type";
-import { createTypingWord } from "./create-typing-word";
+import { parseWordToChunks } from "../build-typing-map/parse-word-to-chunks.js";
+import type { TypingWord, WordChunk } from "../type.js";
+import { createTypingWord } from "./create-typing-word.js";
 
 export const recreateTypingWord = (typingWord: TypingWord): TypingWord => {
   if (!typingWord.nextChunk.kana || !typingWord.wordChunks[0]) {

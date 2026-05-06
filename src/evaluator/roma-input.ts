@@ -1,7 +1,7 @@
-import type { TypingWord, WordChunk } from "../type";
-import { NN_PATTERN_SET } from "../utils/const";
-import { isAlphabet } from "../utils/is-alphabet";
-import type { TypingInput } from "./type";
+import type { TypingWord, WordChunk } from "../type.js";
+import { NN_PATTERN_SET } from "../utils/const.js";
+import { isAlphabet } from "../utils/is-alphabet.js";
+import type { TypingInput } from "./type.js";
 
 export const romaMakeInput = (
   event: Pick<KeyboardEvent, "key" | "code" | "shiftKey" | "getModifierState">,

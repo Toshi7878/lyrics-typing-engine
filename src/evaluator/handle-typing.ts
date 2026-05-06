@@ -1,5 +1,5 @@
-import type { InputMode, TypingWord, WordChunk } from "../type";
-import { evaluateKanaInput, evaluateRomaInput } from "./typing-input-evaluator";
+import type { InputMode, TypingWord, WordChunk } from "../type.js";
+import { evaluateKanaInput, evaluateRomaInput } from "./typing-input-evaluator.js";
 
 export const handleTyping = <TSuccessReturn extends Record<string, unknown>>(
   {

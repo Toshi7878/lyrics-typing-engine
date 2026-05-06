@@ -1,7 +1,7 @@
-import type { InputMode, TypingWord } from "../type";
-import { kanaInput, kanaMakeInput } from "./kana-input";
-import { romaInput, romaMakeInput } from "./roma-input";
-import type { TypingInput, TypingInputResult } from "./type";
+import type { InputMode, TypingWord } from "../type.js";
+import { kanaInput, kanaMakeInput } from "./kana-input.js";
+import { romaInput, romaMakeInput } from "./roma-input.js";
+import type { TypingInput, TypingInputResult } from "./type.js";
 
 export const evaluateRomaInput = ({
   event,

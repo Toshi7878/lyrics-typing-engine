@@ -1,8 +1,8 @@
-import type { WordChunk } from "../type";
-import { NN_PATTERN_SET } from "../utils/const";
-import { isAlphabet } from "../utils/is-alphabet";
-import { convertZenkakuToHankaku } from "../utils/zenkaku-to-hankaku";
-import { NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
+import type { WordChunk } from "../type.js";
+import { NN_PATTERN_SET } from "../utils/const.js";
+import { isAlphabet } from "../utils/is-alphabet.js";
+import { convertZenkakuToHankaku } from "../utils/zenkaku-to-hankaku.js";
+import { NUM_LIST, ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const.js";
 
 // biome-ignore format:<>
 const SOKUON_JOIN_LIST = ["ヰ", "ゐ", "ヱ", "ゑ", "ぁ", "ぃ", "ぅ", "ぇ", "ぉ", "ゃ", "ゅ", "ょ", "っ", "ゎ", "ヵ", "ヶ", "ゔ", "か", "き", "く", "け", "こ", "さ", "し", "す", "せ", "そ", "た", "ち", "つ", "て", "と", "は", "ひ", "ふ", "へ", "ほ", "ま", "み", "む", "め", "も", "や", "ゆ", "よ", "ら", "り", "る", "れ", "ろ", "わ", "を", "が", "ぎ", "ぐ", "げ", "ご", "ざ", "じ", "ず", "ぜ", "ぞ", "だ", "ぢ", "づ", "で", "ど", "ば", "び", "ぶ", "べ", "ぼ", "ぱ", "ぴ", "ぷ", "ぺ", "ぽ"];

@@ -1,4 +1,4 @@
-import type { TypingWord, WordChunk } from "../type";
+import type { TypingWord, WordChunk } from "../type.js";
 
 export interface TypingInput {
   inputChars: string[];

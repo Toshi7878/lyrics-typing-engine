@@ -1,4 +1,4 @@
-import type { TypingWord } from "../type";
+import type { TypingWord } from "../type.js";
 
 export const createDisplayWord = (
   typingWord: TypingWord,

@@ -1,4 +1,4 @@
-import type { BuiltMapLine, TypingWord } from "../type";
+import type { BuiltMapLine, TypingWord } from "../type.js";
 
 export const createTypingWord = <TOptions = unknown>(
   builtMapLine: Pick<BuiltMapLine<TOptions>, "wordChunks">,

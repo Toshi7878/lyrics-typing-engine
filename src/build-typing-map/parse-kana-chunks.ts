@@ -1,4 +1,4 @@
-import { ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const";
+import { ROMA_MAP, SYMBOL_TO_ROMA_MAP } from "./const.js";
 
 export const parseKanaChunks = (sentence: string) => {
   const pattern = Array.from(ROMA_MAP.keys()).concat(Array.from(SYMBOL_TO_ROMA_MAP.keys())).join("|");

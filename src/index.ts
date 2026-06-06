@@ -1,4 +1,5 @@
 export { buildTypingMap } from "./build-typing-map/build-map.js";
+export { CODE_TO_KANA, KEY_TO_KANA } from "./evaluator/const.js";
 export {
   createDisplayWord,
   replaceAllSpaceWithLowMacron,

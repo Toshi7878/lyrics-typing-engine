@@ -135,6 +135,25 @@ export const kanaInput = (
     };
   }
 
+  if (dakutenInfo) {
+    const directIndex = inputChars.indexOf(dakutenInfo.dakuonKana);
+    if (directIndex !== -1) {
+      if (nextKana.length >= 2) {
+        newLineWord.correct.kana += dakutenInfo.dakuonKana;
+        newLineWord.nextChunk.kana = nextKana.slice(1);
+        return {
+          newLineWord,
+          successKey: inputChars[directIndex],
+          failKey: undefined,
+          isUpdatePoint: false,
+        };
+      }
+
+      const result = wordUpdate(dakutenInfo.dakuonKana, newLineWord);
+      return { ...result, successKey: inputChars[directIndex], failKey: undefined };
+    }
+  }
+
   const targetChar = dakutenInfo
     ? dakutenInfo.seionKana
     : isCaseSensitive

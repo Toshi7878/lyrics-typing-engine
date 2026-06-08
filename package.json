@@ -1,6 +1,6 @@
 {
   "name": "lyrics-typing-engine",
-  "version": "2.0.7",
+  "version": "2.1.0",
   "type": "module",
   "description": "A typing engine designed for music-based typing games. Provides time-tagged typing map generation and kana/roma input evaluation synchronized with music playback.",
   "main": "dist/index.js",
